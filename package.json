@@ -1,15 +1,42 @@
 {
   "name": "validated-types",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Validated integer, float, string and array types for Typescript",
+  "author": {
+    "name": "Petri Silen",
+    "email": "petri.silen@silensoft.com"
+  },
+  "engines": {
+    "node": ">= 12.19"
+  },
+  "license": "MIT",
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pksilen/validated-types.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pksilen/validated-types/issues"
+  },
+  "keywords": [
+    "validator",
+    "validate",
+    "validation",
+    "string",
+    "integer",
+    "float",
+    "array",
+    "type",
+    "typescript"
+  ],
   "scripts": {
     "prebuild": "rimraf lib",
     "build": "tsc",
     "test": "jest"
   },
-  "author": "",
-  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^27.0.1",
     "@types/node": "^16.7.13",
