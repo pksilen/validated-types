@@ -1,11 +1,14 @@
 import IntValidationSpecError from './IntValidationSpecError';
 import IntValidationError from './IntValidationError';
+import { customIntValidators } from './registerCustomIntValidator';
 
-export type IntValidationSpec<MinValueMaxValueDivisibleByValue extends string> =
-  MinValueMaxValueDivisibleByValue extends `${infer MinValue},${infer MaxValue},${infer DivisibleByValue}`
+export type IntValidationSpec<MinValueMaxValueDivisibleByValueOrCustomValidator extends string> =
+  MinValueMaxValueDivisibleByValueOrCustomValidator extends `${infer MinValue},${infer MaxValue},${infer DivisibleByValue}`
     ? `${MinValue},${MaxValue},${DivisibleByValue}`
-    : MinValueMaxValueDivisibleByValue extends `${infer MinValue},${infer MaxValue}`
+    : MinValueMaxValueDivisibleByValueOrCustomValidator extends `${infer MinValue},${infer MaxValue}`
     ? `${MinValue},${MaxValue}`
+    : MinValueMaxValueDivisibleByValueOrCustomValidator extends `custom:${infer ValidatorName}`
+    ? `custom:${ValidatorName}`
     : never;
 
 export class VInt<MinValueMaxValueDivisibleByValue extends string> {
@@ -20,6 +23,19 @@ export class VInt<MinValueMaxValueDivisibleByValue extends string> {
   }
 
   protected constructor(validationSpec: IntValidationSpec<MinValueMaxValueDivisibleByValue>, value: number) {
+    if (validationSpec.startsWith('custom:')) {
+      const [, validatorName] = validationSpec.split(':');
+      if (!customIntValidators[validatorName]) {
+        throw new IntValidationSpecError();
+      }
+      if (customIntValidators[validatorName](value)) {
+        this.validatedValue = value;
+        return;
+      } else {
+        throw new IntValidationError(validationSpec, value);
+      }
+    }
+
     const [minValueStr, maxValueStr, divisibleByValueStr] = validationSpec.split(',');
     let minValue = parseInt(minValueStr, 10);
     let maxValue = parseInt(maxValueStr, 10);
