@@ -27,4 +27,3 @@ export default class VString<ValidationString extends string> {
     return this._value;
   }
 }
-

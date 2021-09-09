@@ -1,14 +1,11 @@
 // noinspection MagicNumberJS
 
-import { VInt } from './VInt';
+import VInt from './VInt';
 import IntValidationError from './IntValidationError';
 import IntValidationSpecError from './IntValidationSpecError';
-import { VFloat } from '../float/VFloat';
-import registerCustomFloatValidator from '../float/registerCustomFloatValidator';
-import FloatValidationError from '../float/FloatValidationError';
-import FloatValidationSpecError from '../float/FloatValidationSpecError';
+import registerCustomIntValidator from './registerCustomIntValidator';
 
-registerCustomFloatValidator('is5', (value) => value === 5);
+registerCustomIntValidator('is5', (value) => value === 5);
 
 describe('VInt', () => {
   describe('createOrThrow', () => {
@@ -27,7 +24,7 @@ describe('VInt', () => {
       expect(int.value).toEqual(5);
     });
     it('should create a VInt object successfully when custom validation function call evaluates to true for the value', () => {
-      const int: VFloat<'custom:is5'> = VFloat.createOrThrow('custom:is5', 5);
+      const int: VInt<'custom:is5'> = VInt.createOrThrow('custom:is5', 5);
       expect(int.value).toEqual(5);
     });
     it('should throw IntValidationError when value is greater than maxValue specified in validation spec', () => {
@@ -50,10 +47,10 @@ describe('VInt', () => {
         VInt.createOrThrow<'0,10,5'>('0,10,5', 3);
       }).toThrow(IntValidationError);
     });
-    it('should throw FloatValidationError when custom validation function call evaluates to false for the value', () => {
+    it('should throw IntValidationError when custom validation function call evaluates to false for the value', () => {
       expect(() => {
-        VFloat.createOrThrow<'custom:is5'>('custom:is5', 3);
-      }).toThrow(FloatValidationError);
+        VInt.createOrThrow<'custom:is5'>('custom:is5', 3);
+      }).toThrow(IntValidationError);
     });
     it('should throw IntValidationSpecError when minValue in validation spec is invalid', () => {
       expect(() => {
@@ -75,10 +72,10 @@ describe('VInt', () => {
         VInt.createOrThrow<'0,10,a'>('0,10,a', 0);
       }).toThrow(IntValidationSpecError);
     });
-    it('should throw FloatValidationSpecError when custom validator is not registered', () => {
+    it('should throw IntValidationSpecError when custom validator is not registered', () => {
       expect(() => {
-        VFloat.createOrThrow<'custom:not_registered'>('custom:not_registered', 4);
-      }).toThrow(FloatValidationSpecError);
+        VInt.createOrThrow<'custom:not_registered'>('custom:not_registered', 4);
+      }).toThrow(IntValidationSpecError);
     });
     it('should use Number.MIN_SAFE_INTEGER as minValue when minValue in validation spec is missing', () => {
       const int = VInt.createOrThrow<',10'>(',10', Number.MIN_SAFE_INTEGER);

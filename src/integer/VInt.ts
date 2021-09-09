@@ -11,7 +11,7 @@ export type IntValidationSpec<MinValueMaxValueDivisibleByValueOrCustomValidator 
     ? `custom:${ValidatorName}`
     : never;
 
-export class VInt<MinValueMaxValueDivisibleByValue extends string> {
+export default class VInt<MinValueMaxValueDivisibleByValue extends string> {
   private readonly validatedValue: number;
 
   // this will throw if invalid value is given that don't match the validation spec

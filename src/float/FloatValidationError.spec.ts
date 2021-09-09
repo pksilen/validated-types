@@ -1,4 +1,4 @@
-import { VFloat } from './VFloat';
+import VFloat from './VFloat';
 
 describe('FloatValidationError', () => {
   it('should have a proper error message', () => {

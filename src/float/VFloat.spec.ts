@@ -1,6 +1,6 @@
 // noinspection MagicNumberJS
 
-import { VFloat } from './VFloat';
+import VFloat from './VFloat';
 import FloatValidationError from './FloatValidationError';
 import FloatValidationSpecError from './FloatValidationSpecError';
 import registerCustomFloatValidator from './registerCustomFloatValidator';

@@ -9,7 +9,7 @@ export type FloatValidationSpec<MinValueMaxValueOrCustomValidator extends string
     ? `custom:${ValidatorName}`
     : never;
 
-export class VFloat<MinValueMaxValueOrCustomValidator extends string> {
+export default class VFloat<MinValueMaxValueOrCustomValidator extends string> {
   private readonly validatedValue: number;
 
   // this will throw if invalid value is given that don't match the validation spec

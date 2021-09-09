@@ -1,5 +1,3 @@
-const stringValidationFunctions = {
-
-};
+const stringValidationFunctions = {};
 
 export default stringValidationFunctions;
