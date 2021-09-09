@@ -1,3 +1,5 @@
+// noinspection MagicNumberJS
+
 import { VFloat } from './VFloat';
 import FloatValidationError from './FloatValidationError';
 import FloatValidationSpecError from './FloatValidationSpecError';
@@ -9,7 +11,12 @@ describe('VFloat', () => {
       const value = float.value;
       expect(value).toEqual(5.1);
     });
-    it('should throw when value is greater than maxValue specified in validation spec', () => {
+    it('should create a VFloat object successfully when validation spec contains whitespace', () => {
+      const float: VFloat<' 0.5 , 10.5 '> = VFloat.createOrThrow(' 0.5 , 10.5 ', 5.1);
+      const value = float.value;
+      expect(value).toEqual(5.1);
+    });
+    it('should throw loatValidationError  when value is greater than maxValue specified in validation spec', () => {
       expect(() => {
         VFloat.createOrThrow<'0.5,10.5'>('0.5,10.5', 20.1);
       }).toThrow(FloatValidationError);
@@ -29,20 +36,19 @@ describe('VFloat', () => {
         VFloat.createOrThrow<'0.5,a'>('0.5,a', 0.4);
       }).toThrow(FloatValidationSpecError);
     });
-    it('should throw FloatValidationSpecError when minValue in validation spec is missing', () => {
-      expect(() => {
-        VFloat.createOrThrow<',10.5'>(',10.5', 0.4);
-      }).toThrow(FloatValidationSpecError);
+    it('should use Number.MIN_VALUE as minValue when minValue in validation spec is missing', () => {
+      const float = VFloat.createOrThrow<',10.5'>(',10.5', Number.MIN_VALUE);
+      expect(float.value).toEqual(Number.MIN_VALUE);
     });
-    it('should throw FloatValidationSpecError when maxValue in validation spec is missing', () => {
-      expect(() => {
-        VFloat.createOrThrow<'10.5,'>('10.5,', 0.4);
-      }).toThrow(FloatValidationSpecError);
+    it('should use Number.MAX_VALUE as maxValue when maxValue invalidation spec is missing', () => {
+      const float = VFloat.createOrThrow<'10.5,'>('10.5,', Number.MAX_VALUE);
+      expect(float.value).toEqual(Number.MAX_VALUE);
     });
-    it('should throw FloatValidationSpecError when minValue and maxValue in validation spec are missing', () => {
-      expect(() => {
-        VFloat.createOrThrow<','>(',', 0.4);
-      }).toThrow(FloatValidationSpecError);
+    it('should use Number.MIN_VALUE and Number.MAX_VALUE as minValue and maxValue when minValue and maxValue in validation spec are missing', () => {
+      const float1 = VFloat.createOrThrow<','>(',', Number.MIN_VALUE);
+      const float2 = VFloat.createOrThrow<','>(',', Number.MAX_VALUE);
+      expect(float1.value).toEqual(Number.MIN_VALUE);
+      expect(float2.value).toEqual(Number.MAX_VALUE);
     });
   });
 });

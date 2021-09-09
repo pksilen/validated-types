@@ -15,10 +15,18 @@ export class VFloat<MinValueMaxValue extends string> {
     return new VFloat<VS>(validationSpec, value);
   }
 
-  protected constructor(private readonly validationSpec: FloatValidationSpec<MinValueMaxValue>, value: number) {
-    const [minValueStr, maxValueStr] = this.validationSpec.split(',');
-    const minValue = parseFloat(minValueStr);
-    const maxValue = parseFloat(maxValueStr);
+  protected constructor(validationSpec: FloatValidationSpec<MinValueMaxValue>, value: number) {
+    const [minValueStr, maxValueStr] = validationSpec.split(',');
+    let minValue = parseFloat(minValueStr);
+    let maxValue = parseFloat(maxValueStr);
+
+    if (minValueStr === '') {
+      minValue = Number.MIN_VALUE;
+    }
+
+    if (maxValueStr === '') {
+      maxValue = Number.MAX_VALUE
+    }
 
     if (isNaN(minValue) || isNaN(maxValue)) {
       throw new FloatValidationSpecError();
@@ -27,7 +35,7 @@ export class VFloat<MinValueMaxValue extends string> {
     if (value >= minValue && value <= maxValue) {
       this.validatedValue = value;
     } else {
-      throw new FloatValidationError(this.validationSpec, value);
+      throw new FloatValidationError(validationSpec, value);
     }
   }
 
