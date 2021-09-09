@@ -1,34 +1,37 @@
 import FloatValidationSpecError from './FloatValidationSpecError';
-import throwError from '../error/throwError';
 import FloatValidationError from './FloatValidationError';
 
 export type FloatValidationSpec<ValidationSpec extends string> =
-  ValidationSpec extends `${infer MinValue},${infer MaxValue}` ? [MinValue, MaxValue] : never;
+  ValidationSpec extends `${infer MinValue},${infer MaxValue}` ? `${MinValue},${MaxValue}` : never;
 
-export class VFloat<ValidationSpec extends string> {
-  private readonly _value: number | null;
+export class VFloat<MinValueMaxValue extends string> {
+  private readonly validatedValue: number;
 
-  constructor(private readonly validationSpec: FloatValidationSpec<ValidationSpec>, _value: number) {
-    const minValue = parseFloat(this.validationSpec[0]);
-    const maxValue = parseFloat(this.validationSpec[1]);
+  // this will throw if invalid value is given that don't match the validation spec
+  static createOrThrow<VS extends string>(
+    validationSpec: FloatValidationSpec<VS>,
+    value: number
+  ): VFloat<VS> | never {
+    return new VFloat<VS>(validationSpec, value);
+  }
+
+  protected constructor(private readonly validationSpec: FloatValidationSpec<MinValueMaxValue>, value: number) {
+    const [minValueStr, maxValueStr] = this.validationSpec.split(',');
+    const minValue = parseFloat(minValueStr);
+    const maxValue = parseFloat(maxValueStr);
 
     if (isNaN(minValue) || isNaN(maxValue)) {
       throw new FloatValidationSpecError();
     }
 
-    if (_value >= minValue && _value <= maxValue) {
-      this._value = _value;
+    if (value >= minValue && value <= maxValue) {
+      this.validatedValue = value;
     } else {
-      this._value = null;
+      throw new FloatValidationError(this.validationSpec, value);
     }
   }
 
-  get value(): number | null {
-    return this._value;
-  }
-
-  get valueOrThrow(): number {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return this._value ?? throwError(new FloatValidationError(this.validationSpec, this._value!))
+  get value(): number {
+    return this.validatedValue;
   }
 }
