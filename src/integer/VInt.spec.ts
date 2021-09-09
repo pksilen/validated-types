@@ -4,17 +4,25 @@ import { VInt } from './VInt';
 import IntValidationError from './IntValidationError';
 import IntValidationSpecError from './IntValidationSpecError';
 
-describe('VFInt', () => {
+describe('VInt', () => {
   describe('createOrThrow', () => {
     it('should create a VInt object successfully when value matches validation spec', () => {
-      const int: VInt<'0,10'> = VInt.createOrThrow('0,10', 5);
-      const value = int.value;
-      expect(value).toEqual(5);
+      const int1: VInt<'0,10'> = VInt.createOrThrow('0,10', 5);
+      const int2: VInt<'0,10,'> = VInt.createOrThrow('0,10,', 5);
+      expect(int1.value).toEqual(5);
+      expect(int2.value).toEqual(5);
     });
-    it('should create a Vint object successfully when validation spec contains whitespace', () => {
-      const float: VInt<' 0 , 10 '> = VInt.createOrThrow(' 0 , 10 ', 5);
-      const value = float.value;
-      expect(value).toEqual(5);
+    it('should create a VInt object successfully when validation spec contains whitespace', () => {
+      const int: VInt<' 0 , 10 '> = VInt.createOrThrow(' 0 , 10 ', 5);
+      expect(int.value).toEqual(5);
+    });
+    it('should create a VInt object successfully when validation spec contains divisibleByValue', () => {
+      const int: VInt<'0,10,5'> = VInt.createOrThrow('0,10,5', 5);
+      expect(int.value).toEqual(5);
+    });
+    it('should create a VInt object successfully when validation spec contains divisibleByValue', () => {
+      const int: VInt<'0,10,5'> = VInt.createOrThrow('0,10,5', 5);
+      expect(int.value).toEqual(5);
     });
     it('should throw IntValidationError when value is greater than maxValue specified in validation spec', () => {
       expect(() => {
@@ -31,6 +39,11 @@ describe('VFInt', () => {
         VInt.createOrThrow<'0,10'>('0,10', 5.1);
       }).toThrow(IntValidationError);
     });
+    it('should throw IntValidationError when value is not divisible by value giving in validation spec', () => {
+      expect(() => {
+        VInt.createOrThrow<'0,10,5'>('0,10,5', 3);
+      }).toThrow(IntValidationError);
+    });
     it('should throw IntValidationSpecError when minValue in validation spec is invalid', () => {
       expect(() => {
         VInt.createOrThrow<'a,10'>('a,10', 0);
@@ -39,6 +52,16 @@ describe('VFInt', () => {
     it('should throw IntValidationSpecError when maxValue in validation spec is invalid', () => {
       expect(() => {
         VInt.createOrThrow<'0,a'>('0,a', 0);
+      }).toThrow(IntValidationSpecError);
+    });
+    it('should throw IntValidationSpecError when divisibleByValue is zero', () => {
+      expect(() => {
+        VInt.createOrThrow<'0,10,0'>('0,10,0', 0);
+      }).toThrow(IntValidationSpecError);
+    });
+    it('should throw IntValidationSpecError when divisibleByValue is invalid', () => {
+      expect(() => {
+        VInt.createOrThrow<'0,10,a'>('0,10,a', 0);
       }).toThrow(IntValidationSpecError);
     });
     it('should use Number.MIN_SAFE_INTEGER as minValue when minValue in validation spec is missing', () => {

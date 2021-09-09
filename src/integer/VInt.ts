@@ -12,11 +12,11 @@ export class VInt<MinValueMaxValueDivisibleByValue extends string> {
   private readonly validatedValue: number;
 
   // this will throw if invalid value is given that don't match the validation spec
-  static createOrThrow<VS extends string>(
-    validationSpec: IntValidationSpec<VS>,
+  static createOrThrow<ValidationSpec extends string>(
+    validationSpec: IntValidationSpec<ValidationSpec>,
     value: number
-  ): VInt<VS> | never {
-    return new VInt<VS>(validationSpec, value);
+  ): VInt<ValidationSpec> | never {
+    return new VInt<ValidationSpec>(validationSpec, value);
   }
 
   protected constructor(validationSpec: IntValidationSpec<MinValueMaxValueDivisibleByValue>, value: number) {

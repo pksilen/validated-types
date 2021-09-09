@@ -1,18 +1,18 @@
 import FloatValidationSpecError from './FloatValidationSpecError';
 import FloatValidationError from './FloatValidationError';
 
-export type FloatValidationSpec<ValidationSpec extends string> =
-  ValidationSpec extends `${infer MinValue},${infer MaxValue}` ? `${MinValue},${MaxValue}` : never;
+export type FloatValidationSpec<MinValueMaxValue extends string> =
+  MinValueMaxValue extends `${infer MinValue},${infer MaxValue}` ? `${MinValue},${MaxValue}` : never;
 
 export class VFloat<MinValueMaxValue extends string> {
   private readonly validatedValue: number;
 
   // this will throw if invalid value is given that don't match the validation spec
-  static createOrThrow<VS extends string>(
-    validationSpec: FloatValidationSpec<VS>,
+  static createOrThrow<ValidationSpec extends string>(
+    validationSpec: FloatValidationSpec<ValidationSpec>,
     value: number
-  ): VFloat<VS> | never {
-    return new VFloat<VS>(validationSpec, value);
+  ): VFloat<ValidationSpec> | never {
+    return new VFloat<ValidationSpec>(validationSpec, value);
   }
 
   protected constructor(validationSpec: FloatValidationSpec<MinValueMaxValue>, value: number) {
