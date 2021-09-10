@@ -1,29 +1,83 @@
-import stringValidationFunctions from './stringValidationFunctions';
+import { UnknownLengthStringValidatorNames } from './UnknownLengthStringValidatorNames';
+import { KnownLengthStringValidatorNames } from './KnownLengthStringValidatorNames';
+import { ParameterizedStringValidatorNames } from './ParameterizedStringValidatorNames';
+import StringValidationError from './StringValidationError';
+import { customStringValidators } from './registerCustomStringValidator';
+import StringValidationSpecError from './StringValidationSpecError';
+import { stringValidators } from './stringValidators';
+import IntValidationSpecError from '../integer/IntValidationSpecError';
 
-type StringValidationSpec<ValidationString extends string> =
-  ValidationString extends `${infer MaxLength},${infer ValidationFunctionName}`
-    ? ValidationFunctionName extends 'isAscii'
-      ? `${MaxLength},${ValidationFunctionName}`
+export type StringValidationSpec<ValidationString extends string> =
+  ValidationString extends `${infer MinLength},${infer MaxLength},${infer StringValidatorName},${infer Parameter}`
+    ? StringValidatorName extends ParameterizedStringValidatorNames
+      ? `${MinLength},${MaxLength},${StringValidatorName},${Parameter}`
       : never
+    : ValidationString extends `${infer MinLength},${infer MaxLength},${infer StringValidatorName}`
+    ? StringValidatorName extends UnknownLengthStringValidatorNames
+      ? `${MinLength},${MaxLength},${StringValidatorName}`
+      : never
+    : ValidationString extends `${infer MinLength},${infer MaxLength}`
+    ? `${MinLength},${MaxLength}`
+    : ValidationString extends `${infer KnownLengthStringValidatorName}`
+    ? KnownLengthStringValidatorName extends KnownLengthStringValidatorNames
+      ? `${KnownLengthStringValidatorName}`
+      : never
+    : ValidationString extends `custom:${infer CustomValidatorName}`
+    ? `custom:${CustomValidatorName}`
     : never;
 
 export default class VString<ValidationString extends string> {
-  private readonly _value: string | null;
+  private readonly validatedValue: string;
 
-  constructor(private readonly validationSpec: StringValidationSpec<ValidationString>, stringValue: string) {
-    const maxLength = parseInt(this.validationSpec[0]);
-    if (isNaN(maxLength)) {
-      throw new Error('Invalid string validation string, maxLength must be a number');
+  constructor(private readonly validationSpec: StringValidationSpec<ValidationString>, value: string) {
+    if (validationSpec.startsWith('custom:')) {
+      const [, validatorName] = validationSpec.split(':');
+      if (!customStringValidators[validatorName]) {
+        throw new StringValidationSpecError();
+      }
+      if (customStringValidators[validatorName](value)) {
+        this.validatedValue = value;
+        return;
+      } else {
+        throw new StringValidationError(validationSpec, value);
+      }
     }
 
-    if (stringValue.length <= maxLength && (stringValidationFunctions as any)[this.validationSpec[1]]()) {
-      this._value = stringValue;
+    let minLength = 0;
+    let maxLength = Number.MAX_SAFE_INTEGER;
+    let validatorName;
+    let parameter;
+
+    if (validationSpec.includes(',')) {
+      let minLengthStr;
+      let maxLengthStr;
+      [minLengthStr, maxLengthStr, validatorName, parameter] = validationSpec.split(',');
+      minLength = parseInt(minLengthStr, 10);
+      maxLength = parseInt(maxLengthStr, 10);
+
+      if (minLengthStr === '') {
+        minLength = 0;
+      }
+
+      if (isNaN(minLength) || isNaN(maxLength)) {
+        throw new StringValidationSpecError();
+      }
     } else {
-      this._value = null;
+      validatorName = validationSpec;
+    }
+
+    if (
+      value.length >= minLength &&
+      value.length <= maxLength &&
+      stringValidators[validatorName](value, parameter)
+    ) {
+      this.validatedValue = value;
+    } else {
+      throw new StringValidationError(validationSpec, value);
     }
   }
 
-  get value(): string | null {
-    return this._value;
+  get value(): string {
+    return this.validatedValue;
   }
 }

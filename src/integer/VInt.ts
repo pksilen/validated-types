@@ -11,7 +11,7 @@ export type IntValidationSpec<MinValueMaxValueDivisibleByValueOrCustomValidator 
     ? `custom:${ValidatorName}`
     : never;
 
-export default class VInt<MinValueMaxValueDivisibleByValue extends string> {
+export default class VInt<MinValueMaxValueDivisibleByValueOrCustomValidator extends string> {
   private readonly validatedValue: number;
 
   // this will throw if invalid value is given that don't match the validation spec
@@ -22,7 +22,10 @@ export default class VInt<MinValueMaxValueDivisibleByValue extends string> {
     return new VInt<ValidationSpec>(validationSpec, value);
   }
 
-  protected constructor(validationSpec: IntValidationSpec<MinValueMaxValueDivisibleByValue>, value: number) {
+  protected constructor(
+    validationSpec: IntValidationSpec<MinValueMaxValueDivisibleByValueOrCustomValidator>,
+    value: number
+  ) {
     if (validationSpec.startsWith('custom:')) {
       const [, validatorName] = validationSpec.split(':');
       if (!customIntValidators[validatorName]) {
