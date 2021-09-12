@@ -1,8 +1,38 @@
 // noinspection MagicNumberJS
 
 import validator from 'validator';
+import { KnownLengthStringValidatorNames } from './KnownLengthStringValidatorNames';
+import { UnknownLengthStringValidatorNames } from './UnknownLengthStringValidatorNames';
+import { ParameterizedStringValidatorNames } from './ParameterizedStringValidatorNames';
+import StringValidationSpecError from './StringValidationSpecError';
 
-export const stringValidators: { [validatorName: string]: (value: string, parameter?: string) => boolean } = {
+function parseJSONArrayParameter(parameter: string | undefined): string[] {
+  if (!parameter) {
+    return [];
+  }
+
+  try {
+    const parameters = JSON.parse(parameter);
+    if (!Array.isArray(parameters)) {
+      throw new StringValidationSpecError(
+        `Validator parameter must a JSON array of strings, for example ["abc", "xyz"]`
+      );
+    }
+
+    return parameters.map((parameter) => (typeof parameter === 'string' ? parameter : parameter.toString()));
+  } catch {
+    throw new StringValidationSpecError(
+      `Validator parameter must a JSON array of strings, for example ["abc", "xyz"]`
+    );
+  }
+}
+
+export const stringValidators: {
+  [K in
+    | KnownLengthStringValidatorNames
+    | UnknownLengthStringValidatorNames
+    | ParameterizedStringValidatorNames]: (value: string, parameter?: string) => boolean;
+} = {
   boolean: (value) => value.length <= 5 && validator.isBoolean(value),
   bic: (value) => value.length <= 11 && validator.isBIC(value),
   btcAddress: (value) => value.length <= 35 && validator.isBtcAddress(value),
@@ -15,7 +45,7 @@ export const stringValidators: { [validatorName: string]: (value: string, parame
   isin: (value) => value.length <= 12 && validator.isISIN(value),
   iban: (value) => value.length <= 42 && validator.isIBAN(value),
   ipv4: (value) => value.length <= 15 && validator.isIP(value, 4),
-  ipv6: (value) => value.length <= 39 && validator.isIP(value, 4),
+  ipv6: (value) => value.length <= 39 && validator.isIP(value, 6),
   iso31661Alpha2: (value) => value.length <= 2 && validator.isISO31661Alpha2(value),
   iso31661Alpha3: (value) => value.length <= 3 && validator.isISO31661Alpha3(value),
   iso8601: (value) => value.length <= 64 && validator.isISO8601(value),
@@ -34,12 +64,6 @@ export const stringValidators: { [validatorName: string]: (value: string, parame
     value.length <= 7 && !!value.match(/^(0[1-9]|1[0-2])\/([0-9]{2}|[2-9][0-9]{3})$/),
   cvc: (value) => value.length <= 4 && !!value.match(/^[0-9]{3,4}$/),
   mobileNumber: (value) => value.length <= 32 && validator.isMobilePhone(value, 'any'),
-  includes: (value, parameter) => (parameter ? value.includes(parameter) : false),
-  matches: (value, parameter) => (parameter ? !!value.match(parameter) : false),
-  isOneOf: (value, parameter) => (parameter as unknown as string[]).includes(value),
-  isNoneOf: (value, parameter) => !(parameter as unknown as string[]).includes(value),
-  startsWith: (value, parameter) => (parameter ? value.startsWith(parameter) : false),
-  endsWith: (value, parameter) => (parameter ? value.endsWith(parameter) : false),
   alpha: (value) => validator.isAlpha(value),
   alphanumeric: (value) => validator.isAlphanumeric(value),
   ascii: (value) => validator.isAscii(value),
@@ -69,4 +93,12 @@ export const stringValidators: { [validatorName: string]: (value: string, parame
   uppercase: (value) => validator.isUppercase(value),
   strongPassword: (value) => validator.isStrongPassword(value),
   url: (value) => validator.isURL(value),
+  includes: (value, parameter) => (parameter ? value.includes(parameter) : false),
+  match: (value, parameter) => (parameter ? !!value.match(parameter) : false),
+  isOneOf: (value, parameter) => {
+    return parseJSONArrayParameter(parameter).includes(value);
+  },
+  isNoneOf: (value, parameter) => !parseJSONArrayParameter(parameter).includes(value),
+  startsWith: (value, parameter) => (parameter ? value.startsWith(parameter) : false),
+  endsWith: (value, parameter) => (parameter ? value.endsWith(parameter) : false),
 };

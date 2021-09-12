@@ -9,16 +9,38 @@ registerCustomStringValidator('is5', (value) => value === '5');
 
 describe('VString', () => {
   describe('createOrThrow', () => {
-    it('should create a VString object successfully when value matches validation spec', () => {
-      const string1: VString<'0,10'> = VString.createOrThrow('0,10', 'abc');
-      const string2: VString<'0,10,alpha'> = VString.createOrThrow('0,10,alpha', 'abc');
-      const string3: VString<'ipv4'> = VString.createOrThrow('ipv4', '127.0.0.1');
-      const string4: VString<'0,10,includes,abc'> = VString.createOrThrow('0,10,includes,abc', ' abc');
+    it('should create a VString object successfully when value matches validation spec containing min length and max length validators', () => {
+      const string: VString<'0,10'> = VString.createOrThrow('0,10', 'abc');
+      expect(string.value).toEqual('abc');
+    });
+    it('should create a VString object successfully when value matches validation spec containing min length, max length and unknown length validators ', () => {
+      const string: VString<'0,10,alpha'> = VString.createOrThrow('0,10,alpha', 'abc');
+      expect(string.value).toEqual('abc');
+    });
+    it('should create a VString object successfully when value matches validation spec containing known length validator', () => {
+      const string: VString<'ipv4'> = VString.createOrThrow('ipv4', '127.0.0.1');
+      expect(string.value).toEqual('127.0.0.1');
+    });
+    it('should create a VString object successfully when value matches validation spec containing parameterized validator', () => {
+      const string: VString<'0,10,includes,abc'> = VString.createOrThrow('0,10,includes,abc', ' abc');
+      expect(string.value).toEqual(' abc');
+    });
+    it('should create a VString object successfully when value matches multiple validation specs', () => {
+      const string: VString<'0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'> =
+        VString.createOrThrow(
+          ['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'],
+          'https://apiserver.domain.com:8080/index.html'
+        );
 
-      expect(string1.value).toEqual('abc');
-      expect(string2.value).toEqual('abc');
-      expect(string3.value).toEqual('127.0.0.1');
-      expect(string4.value).toEqual(' abc');
+      expect(string.value).toEqual('https://apiserver.domain.com:8080/index.html');
+    });
+    it('should throw StringValidationError when value has multiple validation specs and value does not match one of them', () => {
+      expect(() => {
+        VString.createOrThrow<'0,10,lowercase', 'url', 'startsWith,https', 'endsWith,.html'>(
+          ['0,10,lowercase', 'url', 'startsWith,https', 'endsWith,.html'],
+          'http://apiserver.domain.com:8080/index.html'
+        );
+      }).toThrow(StringValidationError);
     });
     it('should create a VString object successfully when validation spec contains whitespace', () => {
       const string: VString<' 0 , 10 '> = VString.createOrThrow(' 0 , 10 ', 'abc');
@@ -40,7 +62,7 @@ describe('VString', () => {
     });
     it('should throw StringValidationError when value does not match unknown length validator', () => {
       expect(() => {
-        VString.createOrThrow<'0,10,alpha', 'url'>([`0,10,alpha`, 'url'], 'abc123');
+        VString.createOrThrow<'0,10,alpha'>(`0,10,alpha`, 'abc123');
       }).toThrow(StringValidationError);
     });
     it('should throw StringValidationError when value does not match known length validator', () => {
@@ -70,22 +92,21 @@ describe('VString', () => {
     });
     it('should throw StringValidationSpecError when custom validator is not registered', () => {
       expect(() => {
-        VString.createOrThrow<'custom:not_registered'>('custom:not_registered', 4);
+        VString.createOrThrow<'custom:not_registered'>('custom:not_registered', '4');
       }).toThrow(StringValidationSpecError);
     });
-    it('should use Number.MIN_SAFE_INTEGER as minValue when minValue in validation spec is missing', () => {
-      const int = VString.createOrThrow<',10'>(',10', Number.MIN_SAFE_INTEGER);
-      expect(int.value).toEqual(Number.MIN_SAFE_INTEGER);
+    it('should use 0 as minLength when minLength in validation spec is missing', () => {
+      const string = VString.createOrThrow<',10'>(',10', '');
+      expect(string.value).toEqual('');
     });
-    it('should use Number.MAX_SAFE_INTEGER as maxValue when maxValue invalidation spec is missing', () => {
-      const int = VString.createOrThrow<'10,'>('10,', Number.MAX_SAFE_INTEGER);
-      expect(int.value).toEqual(Number.MAX_SAFE_INTEGER);
+    it('should throw StringValidationSpecError when maxLength in validation spec is missing', () => {
+      expect(() => {
+        VString.createOrThrow<'10,'>('10,', 'abc');
+      }).toThrow(StringValidationSpecError);
     });
-    it('should use Number.MIN_SAFE_INTEGER and Number.MAX_SAFE_INTEGER as minValue and maxValue when minValue and maxValue in validation spec are missing', () => {
-      const int1 = VString.createOrThrow<','>(',', Number.MIN_SAFE_INTEGER);
-      const int2 = VString.createOrThrow<','>(',', Number.MAX_SAFE_INTEGER);
-      expect(int1.value).toEqual(Number.MIN_SAFE_INTEGER);
-      expect(int2.value).toEqual(Number.MAX_SAFE_INTEGER);
+    it('should return VString object successfully when isOneOf validator is used', () => {
+      const string = VString.createOrThrow<'0,10,isOneOf,["abc","xyz"]'>('0,10,isOneOf,["abc","xyz"]', 'abc');
+      expect(string.value).toEqual('abc');
     });
   });
 });

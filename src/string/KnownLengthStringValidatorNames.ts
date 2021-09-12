@@ -10,7 +10,6 @@ export type KnownLengthStringValidatorNames =
   | 'hexColor'
   | 'isin'
   | 'iban'
-  | 'imei'
   | 'ipv4'
   | 'ipv6'
   | 'iso31661Alpha2'
@@ -21,7 +20,6 @@ export type KnownLengthStringValidatorNames =
   | 'jwt'
   | 'latLong'
   | 'macAddress'
-  | 'militaryTime'
   | 'mimeType'
   | 'port'
   | 'rgbColor'
@@ -30,5 +28,4 @@ export type KnownLengthStringValidatorNames =
   | 'postalCode'
   | 'creditCardExpiration'
   | 'cvc'
-  | 'mobileNumber'
-  | 'phoneNumber';
+  | 'mobileNumber';

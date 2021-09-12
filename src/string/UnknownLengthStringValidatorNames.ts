@@ -5,7 +5,6 @@ export type UnknownLengthStringValidatorNames =
   | 'base32'
   | 'base58'
   | 'base64'
-  | 'boolean'
   | 'dataUri'
   | 'decimal'
   | 'fqdn'

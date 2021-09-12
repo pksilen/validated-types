@@ -275,6 +275,8 @@ export default class VString<
     otherValidationSpecs.forEach((validationSpec) => {
       this.validateValueWithValidationSpec(validationSpec, value, varName, false);
     });
+
+    this.validatedValue = value;
   }
 
   get value(): string {
@@ -318,14 +320,17 @@ export default class VString<
 
     let minLength = 0;
     let maxLength = Number.MAX_SAFE_INTEGER;
-    let validatorName;
+    let validatorName: string;
     let parameter;
 
     if (validationSpec.includes(',')) {
       if (shouldValidateLength) {
         let minLengthStr;
         let maxLengthStr;
-        [minLengthStr, maxLengthStr, validatorName, parameter] = validationSpec.split(',');
+        let restOfParameter;
+        [minLengthStr, maxLengthStr, validatorName, parameter, ...restOfParameter] =
+          validationSpec.split(',');
+        parameter = restOfParameter.length > 0 ? parameter + ',' + restOfParameter.join(',') : parameter;
         minLength = parseInt(minLengthStr, 10);
         maxLength = parseInt(maxLengthStr, 10);
 
@@ -347,7 +352,7 @@ export default class VString<
       validatorName = validationSpec;
     }
 
-    if (!stringValidators[validatorName]) {
+    if (validatorName && !(stringValidators as any)[validatorName]) {
       throw new StringValidationSpecError('Invalid string validator name: ' + validatorName);
     }
 
@@ -367,14 +372,12 @@ export default class VString<
       );
     }
 
-    if (!stringValidators[validatorName](value, parameter)) {
+    if (validatorName && !(stringValidators as any)[validatorName](value, parameter)) {
       throw new StringValidationError(
         varName
-          ? `Value '${varName}' does not match validator: ${maxLength}`
-          : `Value does not match validator: ${maxLength}`
+          ? `Value '${varName}' does not match validator: ${validatorName}`
+          : `Value does not match validator: ${validatorName}`
       );
     }
-
-    this.validatedValue = value;
   }
 }
