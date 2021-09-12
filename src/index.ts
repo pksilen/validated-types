@@ -10,3 +10,8 @@ export { default as IntValidationError } from './integer/IntValidationError';
 export { default as IntValidationSpecError } from './integer/IntValidationSpecError';
 export { default as registerCustomIntValidator } from './integer/registerCustomIntValidator';
 export { default as VInt } from './integer/VInt';
+
+export { default as StringValidationError } from './string/StringValidationError';
+export { default as StringValidationSpecError } from './string/StringValidationSpecError';
+export { default as registerCustomStringValidator } from './string/registerCustomStringValidator';
+export { default as VString } from './string/VString';
