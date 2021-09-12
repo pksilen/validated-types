@@ -29,7 +29,7 @@ describe('VInt', () => {
     });
     it('should throw IntValidationError when value is greater than maxValue specified in validation spec', () => {
       expect(() => {
-        VInt.createOrThrow<'0,10'>('0,10', 20);
+        VInt.createOrThrow<'0,10'>('0,10', 20, 'varName');
       }).toThrow(IntValidationError);
     });
     it('should throw IntValidationError when value is less than minValue specified in validation spec', () => {

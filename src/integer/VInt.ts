@@ -77,7 +77,7 @@ export default class VInt<ValidationSpec extends string> {
       throw new IntValidationSpecError('Invalid divisibleByValue specified in validation spec');
     }
 
-    if (Number.isInteger(value)) {
+    if (!Number.isInteger(value)) {
       throw new IntValidationError(
         varName ? `Value '${varName}'is not an integer` : 'Value is not an integer'
       );
