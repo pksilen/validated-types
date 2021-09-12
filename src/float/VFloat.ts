@@ -2,28 +2,36 @@ import FloatValidationSpecError from './FloatValidationSpecError';
 import FloatValidationError from './FloatValidationError';
 import { customFloatValidators } from './registerCustomFloatValidator';
 
-export type FloatValidationSpec<MinValueMaxValueOrCustomValidator extends string> =
-  MinValueMaxValueOrCustomValidator extends `${infer MinValue},${infer MaxValue}`
+export type FloatValidationSpec<ValidationSpec extends string> =
+  ValidationSpec extends `${infer MinValue},${infer MaxValue}`
     ? `${MinValue},${MaxValue}`
-    : MinValueMaxValueOrCustomValidator extends `custom:${infer ValidatorName}`
+    : ValidationSpec extends `custom:${infer ValidatorName}`
     ? `custom:${ValidatorName}`
     : never;
 
-export default class VFloat<MinValueMaxValueOrCustomValidator extends string> {
+export default class VFloat<ValidationSpec extends string> {
   private readonly validatedValue: number;
 
   // this will throw if invalid value is given that don't match the validation spec
-  static createOrThrow<ValidationSpec extends string>(
-    validationSpec: FloatValidationSpec<ValidationSpec>,
+  static createOrThrow<VS extends string>(
+    validationSpec: FloatValidationSpec<VS>,
     value: number
-  ): VFloat<ValidationSpec> | never {
-    return new VFloat<ValidationSpec>(validationSpec, value);
+  ): VFloat<VS> | never {
+    return new VFloat<VS>(validationSpec, value);
   }
 
-  protected constructor(
-    validationSpec: FloatValidationSpec<MinValueMaxValueOrCustomValidator>,
+  static create<VS extends string>(
+    validationSpec: FloatValidationSpec<VS>,
     value: number
-  ) {
+  ): VFloat<VS> | null {
+    try {
+      return new VFloat<VS>(validationSpec, value);
+    } catch {
+      return null;
+    }
+  }
+
+  protected constructor(validationSpec: FloatValidationSpec<ValidationSpec>, value: number) {
     if (validationSpec.startsWith('custom:')) {
       const [, validatorName] = validationSpec.split(':');
       if (!customFloatValidators[validatorName]) {

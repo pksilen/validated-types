@@ -2,30 +2,35 @@ import IntValidationSpecError from './IntValidationSpecError';
 import IntValidationError from './IntValidationError';
 import { customIntValidators } from './registerCustomIntValidator';
 
-export type IntValidationSpec<MinValueMaxValueDivisibleByValueOrCustomValidator extends string> =
-  MinValueMaxValueDivisibleByValueOrCustomValidator extends `${infer MinValue},${infer MaxValue},${infer DivisibleByValue}`
+export type IntValidationSpec<ValidationSpec extends string> =
+  ValidationSpec extends `${infer MinValue},${infer MaxValue},${infer DivisibleByValue}`
     ? `${MinValue},${MaxValue},${DivisibleByValue}`
-    : MinValueMaxValueDivisibleByValueOrCustomValidator extends `${infer MinValue},${infer MaxValue}`
+    : ValidationSpec extends `${infer MinValue},${infer MaxValue}`
     ? `${MinValue},${MaxValue}`
-    : MinValueMaxValueDivisibleByValueOrCustomValidator extends `custom:${infer ValidatorName}`
+    : ValidationSpec extends `custom:${infer ValidatorName}`
     ? `custom:${ValidatorName}`
     : never;
 
-export default class VInt<MinValueMaxValueDivisibleByValueOrCustomValidator extends string> {
+export default class VInt<ValidationSpec extends string> {
   private readonly validatedValue: number;
 
   // this will throw if invalid value is given that don't match the validation spec
-  static createOrThrow<ValidationSpec extends string>(
-    validationSpec: IntValidationSpec<ValidationSpec>,
+  static createOrThrow<VS extends string>(
+    validationSpec: IntValidationSpec<VS>,
     value: number
-  ): VInt<ValidationSpec> | never {
-    return new VInt<ValidationSpec>(validationSpec, value);
+  ): VInt<VS> | never {
+    return new VInt<VS>(validationSpec, value);
   }
 
-  protected constructor(
-    validationSpec: IntValidationSpec<MinValueMaxValueDivisibleByValueOrCustomValidator>,
-    value: number
-  ) {
+  static create<VS extends string>(validationSpec: IntValidationSpec<VS>, value: number): VInt<VS> | null {
+    try {
+      return new VInt<VS>(validationSpec, value);
+    } catch {
+      return null;
+    }
+  }
+
+  protected constructor(validationSpec: IntValidationSpec<ValidationSpec>, value: number) {
     if (validationSpec.startsWith('custom:')) {
       const [, validatorName] = validationSpec.split(':');
       if (!customIntValidators[validatorName]) {
