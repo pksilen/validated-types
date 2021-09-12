@@ -57,13 +57,15 @@ export default class VString<
   // this will throw if invalid value is given that don't match the validation spec
   static createOrThrow<VSpec extends string>(
     validationSpec: StringValidationSpecWithLength<VSpec>,
-    value: string
+    value: string,
+    varName?: string
   ): VString<VSpec> | never;
 
   // this will throw if invalid value is given that don't match the validation spec
   static createOrThrow<VSpec extends string, VSpec2 extends string>(
     validationSpec: [StringValidationSpecWithLength<VSpec>, StringValidationSpec<VSpec2>],
-    value: string
+    value: string,
+    varName?: string
   ): VString<VSpec, VSpec2> | never;
 
   // this will throw if invalid value is given that don't match the validation spec
@@ -73,7 +75,8 @@ export default class VString<
       StringValidationSpec<VSpec2>,
       StringValidationSpec<VSpec3>
     ],
-    value: string
+    value: string,
+    varName?: string
   ): VString<VSpec, VSpec2, VSpec3> | never;
 
   // this will throw if invalid value is given that don't match the validation spec
@@ -89,7 +92,8 @@ export default class VString<
       StringValidationSpec<VSpec3>,
       StringValidationSpec<VSpec4>
     ],
-    value: string
+    value: string,
+    varName?: string
   ): VString<VSpec, VSpec2, VSpec3, VSpec4> | never;
 
   // this will throw if invalid value is given that don't match the validation spec
@@ -107,7 +111,8 @@ export default class VString<
       StringValidationSpec<VSpec4>,
       StringValidationSpec<VSpec5>
     ],
-    value: string
+    value: string,
+    varName?: string
   ): VString<VSpec, VSpec2, VSpec3, VSpec4, VSpec5> | never;
 
   // this will throw if invalid value is given that don't match the validation spec
@@ -135,7 +140,8 @@ export default class VString<
           StringValidationSpec<VSpec4>,
           StringValidationSpec<VSpec5>
         ],
-    value: string
+    value: string,
+    varName?: string
   ): VString<VSpec, VSpec2 | undefined, VSpec3 | undefined, VSpec4 | undefined> | never {
     if (typeof validationSpec === 'object' && Array.isArray(validationSpec)) {
       return new VString<
@@ -144,9 +150,98 @@ export default class VString<
         VSpec3 | undefined,
         VSpec4 | undefined,
         VSpec5 | undefined
-      >(validationSpec, value);
+      >(validationSpec, value, varName);
     } else {
-      return new VString<VSpec, VSpec2 | undefined>([validationSpec, undefined], value);
+      return new VString<VSpec, VSpec2 | undefined>([validationSpec, undefined], value, varName);
+    }
+  }
+
+  static create<VSpec extends string>(
+    validationSpec: StringValidationSpecWithLength<VSpec>,
+    value: string
+  ): VString<VSpec> | null;
+
+  static create<VSpec extends string, VSpec2 extends string>(
+    validationSpec: [StringValidationSpecWithLength<VSpec>, StringValidationSpec<VSpec2>],
+    value: string
+  ): VString<VSpec, VSpec2> | null;
+
+  static create<VSpec extends string, VSpec2 extends string, VSpec3 extends string>(
+    validationSpec: [
+      StringValidationSpecWithLength<VSpec>,
+      StringValidationSpec<VSpec2>,
+      StringValidationSpec<VSpec3>
+    ],
+    value: string
+  ): VString<VSpec, VSpec2, VSpec3> | null;
+
+  static create<VSpec extends string, VSpec2 extends string, VSpec3 extends string, VSpec4 extends string>(
+    validationSpec: [
+      StringValidationSpecWithLength<VSpec>,
+      StringValidationSpec<VSpec2>,
+      StringValidationSpec<VSpec3>,
+      StringValidationSpec<VSpec4>
+    ],
+    value: string
+  ): VString<VSpec, VSpec2, VSpec3, VSpec4> | null;
+
+  static create<
+    VSpec extends string,
+    VSpec2 extends string,
+    VSpec3 extends string,
+    VSpec4 extends string,
+    VSpec5 extends string
+  >(
+    validationSpec: [
+      StringValidationSpecWithLength<VSpec>,
+      StringValidationSpec<VSpec2>,
+      StringValidationSpec<VSpec3>,
+      StringValidationSpec<VSpec4>,
+      StringValidationSpec<VSpec5>
+    ],
+    value: string
+  ): VString<VSpec, VSpec2, VSpec3, VSpec4, VSpec5> | null;
+
+  static create<
+    VSpec extends string,
+    VSpec2 extends string | undefined = undefined,
+    VSpec3 extends string | undefined = undefined,
+    VSpec4 extends string | undefined = undefined,
+    VSpec5 extends string | undefined = undefined
+  >(
+    validationSpec:
+      | StringValidationSpecWithLength<VSpec>
+      | [StringValidationSpecWithLength<VSpec>, StringValidationSpec<VSpec2>]
+      | [StringValidationSpecWithLength<VSpec>, StringValidationSpec<VSpec2>, StringValidationSpec<VSpec3>]
+      | [
+          StringValidationSpecWithLength<VSpec>,
+          StringValidationSpec<VSpec2>,
+          StringValidationSpec<VSpec3>,
+          StringValidationSpec<VSpec4>
+        ]
+      | [
+          StringValidationSpecWithLength<VSpec>,
+          StringValidationSpec<VSpec2>,
+          StringValidationSpec<VSpec3>,
+          StringValidationSpec<VSpec4>,
+          StringValidationSpec<VSpec5>
+        ],
+    value: string
+  ): VString<VSpec, VSpec2 | undefined, VSpec3 | undefined, VSpec4 | undefined> | null {
+    try {
+      if (typeof validationSpec === 'object' && Array.isArray(validationSpec)) {
+        return new VString<
+          VSpec,
+          VSpec2 | undefined,
+          VSpec3 | undefined,
+          VSpec4 | undefined,
+          VSpec5 | undefined
+        >(validationSpec, value);
+      } else {
+        return new VString<VSpec, VSpec2 | undefined>([validationSpec, undefined], value);
+      }
+    } catch {
+      return null;
     }
   }
 
@@ -171,13 +266,14 @@ export default class VString<
           StringValidationSpec<ValidationSpec4>,
           StringValidationSpec<ValidationSpec5>
         ],
-    value: string
+    value: string,
+    varName?: string
   ) {
     const [validationSpecWithLength, ...otherValidationSpecs] = validationSpecs;
-    this.validateValueWithValidationSpec(validationSpecWithLength, value, true);
+    this.validateValueWithValidationSpec(validationSpecWithLength, value, varName, true);
 
     otherValidationSpecs.forEach((validationSpec) => {
-      this.validateValueWithValidationSpec(validationSpec, value, false);
+      this.validateValueWithValidationSpec(validationSpec, value, varName, false);
     });
   }
 
@@ -190,6 +286,7 @@ export default class VString<
       | StringValidationSpecWithLength<ValidationSpec>
       | StringValidationSpec<ValidationSpec2 | ValidationSpec3 | ValidationSpec4 | ValidationSpec5>,
     value: string,
+    varName: string | undefined,
     shouldValidateLength: boolean
   ) {
     if (validationSpec === undefined) {
@@ -211,7 +308,11 @@ export default class VString<
         this.validatedValue = value;
         return;
       } else {
-        throw new StringValidationError(validationSpec, value);
+        throw new StringValidationError(
+          varName
+            ? `Value '${varName}' does not match validator: ${validatorName}`
+            : `Value does not match validator: ${validatorName}`
+        );
       }
     }
 
@@ -250,14 +351,30 @@ export default class VString<
       throw new StringValidationSpecError('Invalid string validator name: ' + validatorName);
     }
 
-    if (
-      value.length >= minLength &&
-      value.length <= maxLength &&
-      stringValidators[validatorName](value, parameter)
-    ) {
-      this.validatedValue = value;
-    } else {
-      throw new StringValidationError(validationSpec, value);
+    if (value.length < minLength) {
+      throw new StringValidationError(
+        varName
+          ? `Value '${varName}' is shorter than required minimum length: ${minLength}`
+          : `Value is shorter than required minimum length: ${minLength}`
+      );
     }
+
+    if (value.length > maxLength) {
+      throw new StringValidationError(
+        varName
+          ? `Value '${varName}' is longer than allowed maximum length: ${maxLength}`
+          : `Value is longer than allowed maximum length: ${maxLength}`
+      );
+    }
+
+    if (!stringValidators[validatorName](value, parameter)) {
+      throw new StringValidationError(
+        varName
+          ? `Value '${varName}' does not match validator: ${maxLength}`
+          : `Value does not match validator: ${maxLength}`
+      );
+    }
+
+    this.validatedValue = value;
   }
 }

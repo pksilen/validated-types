@@ -15,32 +15,40 @@ export default class VInt<ValidationSpec extends string> {
   private readonly validatedValue: number;
 
   // this will throw if invalid value is given that don't match the validation spec
-  static createOrThrow<VS extends string>(
-    validationSpec: IntValidationSpec<VS>,
-    value: number
-  ): VInt<VS> | never {
-    return new VInt<VS>(validationSpec, value);
+  static createOrThrow<VSpec extends string>(
+    validationSpec: IntValidationSpec<VSpec>,
+    value: number,
+    varName?: string
+  ): VInt<VSpec> | never {
+    return new VInt<VSpec>(validationSpec, value, varName);
   }
 
-  static create<VS extends string>(validationSpec: IntValidationSpec<VS>, value: number): VInt<VS> | null {
+  static create<VSpec extends string>(
+    validationSpec: IntValidationSpec<VSpec>,
+    value: number
+  ): VInt<VSpec> | null {
     try {
-      return new VInt<VS>(validationSpec, value);
+      return new VInt<VSpec>(validationSpec, value);
     } catch {
       return null;
     }
   }
 
-  protected constructor(validationSpec: IntValidationSpec<ValidationSpec>, value: number) {
+  protected constructor(validationSpec: IntValidationSpec<ValidationSpec>, value: number, varName?: string) {
     if (validationSpec.startsWith('custom:')) {
       const [, validatorName] = validationSpec.split(':');
       if (!customIntValidators[validatorName]) {
-        throw new IntValidationSpecError();
+        throw new IntValidationSpecError('Custom int validator not registered with name: ' + validatorName);
       }
       if (customIntValidators[validatorName](value)) {
         this.validatedValue = value;
         return;
       } else {
-        throw new IntValidationError(validationSpec, value);
+        throw new IntValidationError(
+          varName
+            ? `Value '${varName}' does not match validator: ${validatorName}`
+            : `Value does not match validator: ${validatorName}`
+        );
       }
     }
 
@@ -57,24 +65,41 @@ export default class VInt<ValidationSpec extends string> {
       maxValue = Number.MAX_SAFE_INTEGER;
     }
 
-    if (
-      isNaN(minValue) ||
-      isNaN(maxValue) ||
-      (divisibleByValueStr && (isNaN(divisibleByValue) || divisibleByValue === 0))
-    ) {
-      throw new IntValidationSpecError();
+    if (isNaN(minValue)) {
+      throw new IntValidationSpecError('Invalid minValue specified in validation spec');
     }
 
-    if (
-      Number.isInteger(value) &&
-      value >= minValue &&
-      value <= maxValue &&
-      (!divisibleByValueStr || (divisibleByValueStr && value % divisibleByValue === 0))
-    ) {
-      this.validatedValue = value;
-    } else {
-      throw new IntValidationError(validationSpec, value);
+    if (isNaN(maxValue)) {
+      throw new IntValidationSpecError('Invalid maxValue specified in validation spec');
     }
+
+    if (divisibleByValueStr && (isNaN(divisibleByValue) || divisibleByValue === 0)) {
+      throw new IntValidationSpecError('Invalid divisibleByValue specified in validation spec');
+    }
+
+    if (Number.isInteger(value)) {
+      throw new IntValidationError(
+        varName ? `Value '${varName}'is not an integer` : 'Value is not an integer'
+      );
+    }
+
+    if (value < minValue || value > maxValue) {
+      throw new IntValidationError(
+        varName
+          ? `Value '${varName}' is not in allowed range: [${minValue}, ${maxValue}]`
+          : `Value is not in allowed range: [${minValue}, ${maxValue}]`
+      );
+    }
+
+    if (divisibleByValueStr && value % divisibleByValue !== 0) {
+      throw new IntValidationError(
+        varName
+          ? `Value '${varName}' is not divisible by: ${divisibleByValue}`
+          : `Value is not divisible by: ${divisibleByValue}`
+      );
+    }
+
+    this.validatedValue = value;
   }
 
   get value(): number {
