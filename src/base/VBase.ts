@@ -42,7 +42,7 @@ export default class VBase {
     }
   }
 
-  static validateNumericRange(
+  protected static validateNumericRange(
     validationSpec: string,
     value: number,
     parseNumber: (str: string) => number,
