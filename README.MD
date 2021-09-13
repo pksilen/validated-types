@@ -25,7 +25,7 @@ function useInt(int: VInt<'1,10'>) {
 }
 
 const int: VInt<'1,10'> = VInt.createOrThrow('1,10', 5);
-const possibleInt: VInt<'1, 10'> | null = VInt.create('1,10', 12);
+const possibleInt: VInt<'1,10'> | null = VInt.create('1,10', 12);
 
 useInt(int);
 useInt(possibleInt ?? VInt.create('1,10', 10));
