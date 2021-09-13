@@ -55,19 +55,19 @@ useFloat(float);
 useFloat(possibleFloat ?? VFloat.create('positive', 1));
 ```
 
-To create a validated string which allows URLs with minimum length of zero and maximum length of 1024 characters, you declare:
+To create a validated string which allows URLs with minimum length of one and maximum length of 1024 characters, you declare:
 
 ```ts
-function useString(string: VString<'0,1024,url'>) {
+function useString(string: VString<'1,1024,url'>) {
   // use string here
   console.log(string.value);
 }
 
-const string: VString<'0,1024,url'> = VString.createOrThrow('0,1024,url', 'https://www.mydomain.com');
-const possibleString: VFloat<'0,1024,url'> | null = VFloat.create('0,1024,url', 'invalid URL');
+const string: VString<'1,1024,url'> = VString.createOrThrow('1,1024,url', 'https://www.mydomain.com');
+const possibleString: VFloat<'1,1024,url'> | null = VFloat.create('1,1024,url', 'invalid URL');
 
 useString(string);
-useString(possibleString ?? VString.create('0,1024,url', 'https://google.com'));
+useString(possibleString ?? VString.create('1,1024,url', 'https://google.com'));
 ```
 
 By using validated types in your application's functions' parameters, you can rest assured that only proper values are ever passed to your function.
