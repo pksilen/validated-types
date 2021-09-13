@@ -1,11 +1,8 @@
 // noinspection MagicNumberJS
 
-import registerCustomStringValidator from './registerCustomStringValidator';
 import VString from './VString';
-import StringValidationError from './StringValidationError';
-import StringValidationSpecError from './StringValidationSpecError';
 
-registerCustomStringValidator('is5', (value) => value === '5');
+VString.registerCustomValidator('is5', (value) => value === '5');
 
 describe('VString', () => {
   describe('createOrThrow', () => {
@@ -36,11 +33,12 @@ describe('VString', () => {
     });
     it('should throw StringValidationError when value has multiple validation specs and value does not match one of them', () => {
       expect(() => {
+        // noinspection HttpUrlsUsage
         VString.createOrThrow<'0,10,lowercase', 'url', 'startsWith,https', 'endsWith,.html'>(
           ['0,10,lowercase', 'url', 'startsWith,https', 'endsWith,.html'],
           'http://apiserver.domain.com:8080/index.html'
         );
-      }).toThrow(StringValidationError);
+      }).toThrow('Value does not match validator: startsWith');
     });
     it('should create a VString object successfully when validation spec contains whitespace', () => {
       const string: VString<' 0 , 10 '> = VString.createOrThrow(' 0 , 10 ', 'abc');
@@ -50,87 +48,82 @@ describe('VString', () => {
       const string: VString<'custom:is5'> = VString.createOrThrow('custom:is5', '5');
       expect(string.value).toEqual('5');
     });
-    it('should throw StringValidationError when value length is greater than maxLength specified in validation spec', () => {
+    it('should throw ValidationError when value length is greater than maxLength specified in validation spec', () => {
       expect(() => {
         VString.createOrThrow<'0,5'>('0,5', '123456');
-      }).toThrow(StringValidationError);
+      }).toThrow('Value is longer than allowed maximum length: 5');
     });
-    it('should throw StringValidationError when value length is less than minLength specified in validation spec', () => {
+    it('should throw ValidationError when value length is less than minLength specified in validation spec', () => {
       expect(() => {
         VString.createOrThrow<'5,10'>('5,10', 'abc');
-      }).toThrow(StringValidationError);
+      }).toThrow('Value is shorter than required minimum length: 5');
     });
-    it('should throw StringValidationError when value does not match unknown length validator', () => {
+    it('should throw ValidationError when value does not match unknown length validator', () => {
       expect(() => {
         VString.createOrThrow<'0,10,alpha'>(`0,10,alpha`, 'abc123');
-      }).toThrow(StringValidationError);
+      }).toThrow('Value does not match validator: alpha');
     });
-    it('should throw StringValidationError when value does not match known length validator', () => {
+    it('should throw ValidationError when value does not match known length validator', () => {
       expect(() => {
         VString.createOrThrow<'boolean'>('boolean', 'abc123');
-      }).toThrow(StringValidationError);
+      }).toThrow('Value does not match validator: boolean');
     });
-    it('should throw StringValidationError when value does not match parameterized validator', () => {
+    it('should throw ValidationError when value does not match parameterized validator', () => {
       expect(() => {
         VString.createOrThrow<'0,10,match,ab+'>('0,10,match,ab+', 'xyz');
-      }).toThrow(StringValidationError);
+      }).toThrow('Value does not match validator: match');
     });
-    it('should throw StringValidationError when custom validation function call evaluates to false for the value', () => {
-      expect(() => {
-        VString.createOrThrow<'custom:is5'>('custom:is5', 'abc');
-      }).toThrow(StringValidationError);
-    });
-    it('should throw StringValidationSpecError when minLength in validation spec is invalid', () => {
+    it('should throw ValidationSpecError when minLength in validation spec is invalid', () => {
       expect(() => {
         VString.createOrThrow<'a,10'>('a,10', 'abc');
-      }).toThrow(StringValidationSpecError);
+      }).toThrow('Invalid minLength specified in validation spec');
     });
-    it('should throw StringValidationSpecError when maxLength in validation spec is invalid', () => {
+    it('should throw ValidationSpecError when maxLength in validation spec is invalid', () => {
       expect(() => {
         VString.createOrThrow<'0,a'>('0,a', 'abc');
-      }).toThrow(StringValidationSpecError);
-    });
-    it('should throw StringValidationSpecError when custom validator is not registered', () => {
-      expect(() => {
-        VString.createOrThrow<'custom:not_registered'>('custom:not_registered', '4');
-      }).toThrow(StringValidationSpecError);
+      }).toThrow('Invalid maxLength specified in validation spec');
     });
     it('should use 0 as minLength when minLength in validation spec is missing', () => {
       const string = VString.createOrThrow<',10'>(',10', '');
       expect(string.value).toEqual('');
     });
-    it('should throw StringValidationSpecError when maxLength in validation spec is missing', () => {
+    it('should throw ValidationSpecError when maxLength in validation spec is missing', () => {
       expect(() => {
         VString.createOrThrow<'10,'>('10,', 'abc');
-      }).toThrow(StringValidationSpecError);
+      }).toThrow('Invalid maxLength specified in validation spec');
     });
     it('should return VString object successfully when isOneOf validator is used', () => {
       const string = VString.createOrThrow<'0,10,isOneOf,["abc","xyz"]'>('0,10,isOneOf,["abc","xyz"]', 'abc');
       expect(string.value).toEqual('abc');
     });
-    it('should throw StringValidationSpecError when parameter is not valid JSON string array', () => {
+    it('should throw ValidationSpecError when parameter is not valid JSON string array', () => {
       expect(() => {
         VString.createOrThrow<'0,10,isOneOf,[abc,"xyz"]'>('0,10,isOneOf,[abc,"xyz"]', 'abc');
-      }).toThrow(StringValidationSpecError);
+      }).toThrow('Validator parameter must a JSON array of strings, for example ["abc", "xyz"]');
       expect(() => {
         VString.createOrThrow<'0,10,isOneOf,null'>('0,10,isOneOf,null', 'abc');
-      }).toThrow(StringValidationSpecError);
+      }).toThrow('Validator parameter must a JSON array of strings, for example ["abc", "xyz"]');
       expect(() => {
         VString.createOrThrow<'0,10,isOneOf,'>('0,10,isOneOf,', 'abc');
-      }).toThrow(StringValidationSpecError);
+      }).toThrow('Validator parameter must a JSON array of strings, for example ["abc", "xyz"]');
     });
-    it('should throw StringValidationError with varName when value does not match minLength', () => {
+    it('should throw ValidationError with varName when value does not match minLength', () => {
       expect(() => {
         VString.createOrThrow<'5,10,alpha'>('5,10,alpha', 'abc1', 'varName');
-      }).toThrow("Value 'varName' is shorter than required minimum length: 5");
+      }).toThrow("Value in 'varName' is shorter than required minimum length: 5");
     });
-    it('should throw StringValidationError with varName when value does not match maxLength', () => {
+    it('should throw ValidationError with varName when value does not match maxLength', () => {
       expect(() => {
         VString.createOrThrow<'1,2,alpha'>('1,2,alpha', 'abc', 'varName');
-      }).toThrow("Value 'varName' is longer than allowed maximum length: 2");
+      }).toThrow("Value in 'varName' is longer than allowed maximum length: 2");
+    });
+    it('should throw ValidationError when value does not match validator', () => {
+      expect(() => {
+        VString.createOrThrow<'0,10,alpha'>(`0,10,alpha`, 'abc123');
+      }).toThrow("Value in 'varName' does not match validator: alpha");
     });
   });
-  describe('createOrThrow', () => {
+  describe('create', () => {
     it('should create a VString object successfully when value matches validation spec', () => {
       const possibleString: VString<'0,10'> | null = VString.create('0,10', 'abc');
       expect(possibleString?.value).toEqual('abc');
