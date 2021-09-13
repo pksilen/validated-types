@@ -41,7 +41,6 @@ export default class VFloat<ValidationSpec extends string> extends VBase {
     varName?: string
   ) {
     super();
-    VBase.validateNotError(validationSpec);
     const validationSpecAsStr = validationSpec as string;
     VBase.validateByCustomValidator(validationSpecAsStr, value, varName);
     VBase.validateNumericRange(

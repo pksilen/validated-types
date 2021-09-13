@@ -12,7 +12,7 @@ export type UnknownLengthStringValidatorNames =
   | 'md5'
   | 'sha1'
   | 'sha256'
-  | 'sha348'
+  | 'sha384'
   | 'sha512'
   | 'crc32'
   | 'crc32b'

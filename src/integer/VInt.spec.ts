@@ -26,7 +26,7 @@ describe('VInt', () => {
     });
     it('should throw ValidationError when value is not an integer', () => {
       expect(() => {
-        VInt.createOrThrow<'0,10'>('0,10', 20.1);
+        VInt.createOrThrow<'0,10'>('0,10', 5.1);
       }).toThrow('Value is not an integer');
     });
     it('should throw ValidationError when value is greater than maxValue specified in validation spec', () => {

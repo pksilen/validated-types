@@ -31,11 +31,11 @@ describe('VString', () => {
 
       expect(string.value).toEqual('https://apiserver.domain.com:8080/index.html');
     });
-    it('should throw StringValidationError when value has multiple validation specs and value does not match one of them', () => {
+    it('should throw ValidationError when value has multiple validation specs and value does not match one of them', () => {
       expect(() => {
         // noinspection HttpUrlsUsage
-        VString.createOrThrow<'0,10,lowercase', 'url', 'startsWith,https', 'endsWith,.html'>(
-          ['0,10,lowercase', 'url', 'startsWith,https', 'endsWith,.html'],
+        VString.createOrThrow<'0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'>(
+          ['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'],
           'http://apiserver.domain.com:8080/index.html'
         );
       }).toThrow('Value does not match validator: startsWith');
@@ -117,16 +117,37 @@ describe('VString', () => {
         VString.createOrThrow<'1,2,alpha'>('1,2,alpha', 'abc', 'varName');
       }).toThrow("Value in 'varName' is longer than allowed maximum length: 2");
     });
-    it('should throw ValidationError when value does not match validator', () => {
+    it('should throw ValidationError with varName when value does not match validator', () => {
       expect(() => {
-        VString.createOrThrow<'0,10,alpha'>(`0,10,alpha`, 'abc123');
+        VString.createOrThrow<'0,10,alpha'>(`0,10,alpha`, 'abc123', 'varName');
       }).toThrow("Value in 'varName' does not match validator: alpha");
+    });
+    it('should return a VString object when value is successfully validated as credit card expiration', () => {
+      const string = VString.createOrThrow<'creditCardExpiration'>(`creditCardExpiration`, '11/23');
+      expect(string.value).toEqual('11/23');
+    });
+    it('should return a VString object when value is successfully validated as CVC', () => {
+      const string = VString.createOrThrow<'cvc'>(`cvc`, '999');
+      expect(string.value).toEqual('999');
+    });
+    it('should return a VString object when value is successfully validated with isNoneOf validator', () => {
+      const string = VString.createOrThrow<'0,10,isNoneOf,[123,334]'>('0,10,isNoneOf,[123,334]', '999');
+      expect(string.value).toEqual('999');
     });
   });
   describe('create', () => {
     it('should create a VString object successfully when value matches validation spec', () => {
       const possibleString: VString<'0,10'> | null = VString.create('0,10', 'abc');
       expect(possibleString?.value).toEqual('abc');
+    });
+    it('should create a VString object successfully when value matches multiple validation specs', () => {
+      const possibleString: VString<'0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'> | null =
+        VString.create(
+          ['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'],
+          'https://apiserver.domain.com:8080/index.html'
+        );
+
+      expect(possibleString?.value).toEqual('https://apiserver.domain.com:8080/index.html');
     });
     it('should return null when value does not match validation spec', () => {
       const possibleString: VString<'0,5'> | null = VString.create('0,5', 'abc1234');

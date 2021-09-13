@@ -294,10 +294,6 @@ export default class VString<
       return;
     }
 
-    if (typeof validationSpec === 'object') {
-      throw new ValidationSpecError(validationSpec.errorMessage);
-    }
-
     if (shouldValidateLength) {
       VString.validateLength(validationSpec as string, value, varName);
     }
@@ -328,7 +324,7 @@ export default class VString<
       if (value.length < minLength) {
         throw new ValidationError(
           varName
-            ? `Value '${varName}' is shorter than required minimum length: ${minLength}`
+            ? `Value in '${varName}' is shorter than required minimum length: ${minLength}`
             : `Value is shorter than required minimum length: ${minLength}`
         );
       }
@@ -336,7 +332,7 @@ export default class VString<
       if (value.length > maxLength) {
         throw new ValidationError(
           varName
-            ? `Value '${varName}' is longer than allowed maximum length: ${maxLength}`
+            ? `Value in '${varName}' is longer than allowed maximum length: ${maxLength}`
             : `Value is longer than allowed maximum length: ${maxLength}`
         );
       }
@@ -351,6 +347,10 @@ export default class VString<
   ): void | number {
     let validatorName, parameter;
 
+    if (validationSpec.startsWith('custom:')) {
+      return;
+    }
+
     if (validationSpec.includes(',')) {
       if (shouldValidateLength) {
         let restOfParameter;
@@ -363,14 +363,10 @@ export default class VString<
       validatorName = validationSpec;
     }
 
-    if (validatorName && !(stringValidators as any)[validatorName]) {
-      throw new ValidationSpecError('Invalid string validator name: ' + validatorName);
-    }
-
     if (validatorName && !(stringValidators as any)[validatorName](value, parameter)) {
       throw new ValidationError(
         varName
-          ? `Value '${varName}' does not match validator: ${validatorName}`
+          ? `Value in '${varName}' does not match validator: ${validatorName}`
           : `Value does not match validator: ${validatorName}`
       );
     }

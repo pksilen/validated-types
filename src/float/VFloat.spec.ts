@@ -24,7 +24,7 @@ describe('VFloat', () => {
     });
     it('should create a VFloat object successfully when value is validated as negative', () => {
       const float: VFloat<'negative'> = VFloat.createOrThrow('negative', -5.1);
-      expect(float.value).toEqual(5.1);
+      expect(float.value).toEqual(-5.1);
     });
     it('should throw ValidationError when value is greater than maxValue specified in validation spec', () => {
       expect(() => {
@@ -49,7 +49,7 @@ describe('VFloat', () => {
     it('should throw ValidationError when custom validation function call evaluates to false for the value', () => {
       expect(() => {
         VFloat.createOrThrow<'custom:is5_1'>('custom:is5_1', 0.4);
-      }).toThrow('Value does not match custom float validator: is5_1');
+      }).toThrow('Value does not match custom validator: is5_1');
     });
     it('should throw ValidationSpecError when minValue in validation spec is invalid', () => {
       expect(() => {
@@ -88,12 +88,12 @@ describe('VFloat', () => {
     it('should throw ValidationSpecError with variable name when value is not positive', () => {
       expect(() => {
         VFloat.createOrThrow<'positive'>('positive', -1.2, 'varName');
-      }).toThrow("Value in 'varName' is not positive");
+      }).toThrow("Value in 'varName' must be positive");
     });
     it('should throw ValidationSpecError with variable name when value is not negative', () => {
       expect(() => {
         VFloat.createOrThrow<'negative'>('negative', 1.2, 'varName');
-      }).toThrow("Value in 'varName' is not negative");
+      }).toThrow("Value in 'varName' must be negative");
     });
     it('should throw ValidationSpecError with variable name when using custom validator', () => {
       expect(() => {

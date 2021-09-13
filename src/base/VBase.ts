@@ -22,14 +22,6 @@ export default class VBase {
     return VBase.customValidators[validatorName];
   }
 
-  protected static validateNotError(
-    validationSpec: { [errorMessage: string]: string } | string
-  ): void | never {
-    if (typeof validationSpec === 'object') {
-      throw new ValidationSpecError(validationSpec.errorMessage);
-    }
-  }
-
   protected static validateByCustomValidator(
     validationSpec: string,
     value: string | number,

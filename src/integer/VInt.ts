@@ -40,7 +40,6 @@ export default class VInt<ValidationSpec extends string> extends VBase {
 
   protected constructor(validationSpec: IntValidationSpec<ValidationSpec>, value: number, varName?: string) {
     super();
-    VBase.validateNotError(validationSpec);
     const validationSpecAsStr = validationSpec as string;
     VBase.validateByCustomValidator(validationSpecAsStr, value, varName);
     VBase.validateNumericRange(

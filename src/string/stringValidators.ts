@@ -56,7 +56,7 @@ export const stringValidators: {
   md5: (value) => validator.isHash(value, 'md5'),
   sha1: (value) => validator.isHash(value, 'sha1'),
   sha256: (value) => validator.isHash(value, 'sha256'),
-  sha348: (value) => validator.isHash(value, 'sha384'),
+  sha384: (value) => validator.isHash(value, 'sha384'),
   sha512: (value) => validator.isHash(value, 'sha512'),
   crc32: (value) => validator.isHash(value, 'crc32'),
   crc32b: (value) => validator.isHash(value, 'crc32b'),
