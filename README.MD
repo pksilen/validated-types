@@ -72,7 +72,7 @@ useString(possibleString ?? VString.create('0,1024,url', 'https://google.com'));
 
 By using validated types in your application's functions' parameters, you can rest assured that only proper values are ever passed to your function.
 
-You should create the validated int/float/string objects (VInt/VFloat/VString) in your functions that receive unvalidated input data and then pass those validated values to the other functions in your application.
+You should create the validated int/float/string objects (VInt/VFloat/VString) in functions that receive unvalidated input data and then pass those validated values to the other functions in your application.
 
 Your application typically receives unvalidated input data in following scenarios:
 * Reading command line arguments
@@ -88,7 +88,7 @@ type VPerson = {
   lastName: VString<1,64>;
   email: VString<'email'>;
   password: VString<'strongPassword'>;
-  americanShoeSize: VInt<'1,16'>;
+  age: VInt<0,255>;
   interestPercent: VFloat<'0,100'>;
 }
 ```
