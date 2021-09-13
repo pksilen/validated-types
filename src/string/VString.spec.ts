@@ -108,5 +108,36 @@ describe('VString', () => {
       const string = VString.createOrThrow<'0,10,isOneOf,["abc","xyz"]'>('0,10,isOneOf,["abc","xyz"]', 'abc');
       expect(string.value).toEqual('abc');
     });
+    it('should throw StringValidationSpecError when parameter is not valid JSON string array', () => {
+      expect(() => {
+        VString.createOrThrow<'0,10,isOneOf,[abc,"xyz"]'>('0,10,isOneOf,[abc,"xyz"]', 'abc');
+      }).toThrow(StringValidationSpecError);
+      expect(() => {
+        VString.createOrThrow<'0,10,isOneOf,null'>('0,10,isOneOf,null', 'abc');
+      }).toThrow(StringValidationSpecError);
+      expect(() => {
+        VString.createOrThrow<'0,10,isOneOf,'>('0,10,isOneOf,', 'abc');
+      }).toThrow(StringValidationSpecError);
+    });
+    it('should throw StringValidationError with varName when value does not match minLength', () => {
+      expect(() => {
+        VString.createOrThrow<'5,10,alpha'>('5,10,alpha', 'abc1', 'varName');
+      }).toThrow("Value 'varName' is shorter than required minimum length: 5");
+    });
+    it('should throw StringValidationError with varName when value does not match maxLength', () => {
+      expect(() => {
+        VString.createOrThrow<'1,2,alpha'>('1,2,alpha', 'abc', 'varName');
+      }).toThrow("Value 'varName' is longer than allowed maximum length: 2");
+    });
+  });
+  describe('createOrThrow', () => {
+    it('should create a VString object successfully when value matches validation spec', () => {
+      const possibleString: VString<'0,10'> | null = VString.create('0,10', 'abc');
+      expect(possibleString?.value).toEqual('abc');
+    });
+    it('should return null when value does not match validation spec', () => {
+      const possibleString: VString<'0,5'> | null = VString.create('0,5', 'abc1234');
+      expect(possibleString).toEqual(null);
+    });
   });
 });

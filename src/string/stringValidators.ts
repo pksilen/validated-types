@@ -4,31 +4,10 @@ import validator from 'validator';
 import { KnownLengthStringValidatorNames } from './KnownLengthStringValidatorNames';
 import { UnknownLengthStringValidatorNames } from './UnknownLengthStringValidatorNames';
 import { ParameterizedStringValidatorNames } from './ParameterizedStringValidatorNames';
-import StringValidationSpecError from './StringValidationSpecError';
-
-function parseJSONArrayParameter(parameter: string | undefined): string[] {
-  if (!parameter) {
-    return [];
-  }
-
-  try {
-    const parameters = JSON.parse(parameter);
-    if (!Array.isArray(parameters)) {
-      throw new StringValidationSpecError(
-        `Validator parameter must a JSON array of strings, for example ["abc", "xyz"]`
-      );
-    }
-
-    return parameters.map((parameter) => (typeof parameter === 'string' ? parameter : parameter.toString()));
-  } catch {
-    throw new StringValidationSpecError(
-      `Validator parameter must a JSON array of strings, for example ["abc", "xyz"]`
-    );
-  }
-}
+import parseJSONArrayParameter from './parseJSONArrayParameter';
 
 export const stringValidators: {
-  [K in
+  [ValidatorName in
     | KnownLengthStringValidatorNames
     | UnknownLengthStringValidatorNames
     | ParameterizedStringValidatorNames]: (value: string, parameter?: string) => boolean;

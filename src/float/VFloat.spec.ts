@@ -1,8 +1,6 @@
 // noinspection MagicNumberJS
 
 import VFloat from './VFloat';
-import FloatValidationError from './FloatValidationError';
-import FloatValidationSpecError from './FloatValidationSpecError';
 import registerCustomFloatValidator from './registerCustomFloatValidator';
 
 registerCustomFloatValidator('is5_1', (value) => value === 5.1);
@@ -24,38 +22,38 @@ describe('VFloat', () => {
     it('should throw FloatValidationError when value is greater than maxValue specified in validation spec', () => {
       expect(() => {
         VFloat.createOrThrow<'0.5,10.5'>('0.5,10.5', 20.1);
-      }).toThrow(FloatValidationError);
+      }).toThrow('Value is not in allowed range: [0.5, 10.5]');
     });
     it('should throw FloatValidationError when value is less than minValue specified in validation spec', () => {
       expect(() => {
         VFloat.createOrThrow<'0.5,10.5'>('0.5,10.5', 0.4);
-      }).toThrow(FloatValidationError);
+      }).toThrow('Value is not in allowed range: [0.5, 10.5]');
     });
     it('should throw FloatValidationError when custom validation function call evaluates to false for the value', () => {
       expect(() => {
         VFloat.createOrThrow<'custom:is5_1'>('custom:is5_1', 0.4);
-      }).toThrow(FloatValidationError);
+      }).toThrow('Value does not match custom float validator: is5_1');
     });
     it('should throw FloatValidationSpecError when minValue in validation spec is invalid', () => {
       expect(() => {
         VFloat.createOrThrow<'a,10.5'>('a,10.5', 0.4);
-      }).toThrow(FloatValidationSpecError);
+      }).toThrow('Invalid minValue specified in validation spec: a,10.5');
     });
     it('should throw FloatValidationSpecError when maxValue in validation spec is invalid', () => {
       expect(() => {
         VFloat.createOrThrow<'0.5,a'>('0.5,a', 0.4);
-      }).toThrow(FloatValidationSpecError);
+      }).toThrow('Invalid maxValue specified in validation spec: 0.5,a');
     });
     it('should throw FloatValidationSpecError when custom validator is not registered', () => {
       expect(() => {
         VFloat.createOrThrow<'custom:not_registered'>('custom:not_registered', 0.4);
-      }).toThrow(FloatValidationSpecError);
+      }).toThrow('Custom float validator not registered with name: not_registered');
     });
     it('should use Number.MIN_VALUE as minValue when minValue in validation spec is missing', () => {
       const float = VFloat.createOrThrow<',10.5'>(',10.5', Number.MIN_VALUE);
       expect(float.value).toEqual(Number.MIN_VALUE);
     });
-    it('should use Number.MAX_VALUE as maxValue when maxValue invalidation spec is missing', () => {
+    it('should use Number.MAX_VALUE as maxValue when maxValue in validation spec is missing', () => {
       const float = VFloat.createOrThrow<'10.5,'>('10.5,', Number.MAX_VALUE);
       expect(float.value).toEqual(Number.MAX_VALUE);
     });
@@ -64,6 +62,26 @@ describe('VFloat', () => {
       const float2 = VFloat.createOrThrow<','>(',', Number.MAX_VALUE);
       expect(float1.value).toEqual(Number.MIN_VALUE);
       expect(float2.value).toEqual(Number.MAX_VALUE);
+    });
+    it('should throw FloatValidationSpecError with variable name', () => {
+      expect(() => {
+        VFloat.createOrThrow<'0,10'>('0,10', Number.MAX_VALUE, 'varName');
+      }).toThrow("Value in 'varName' is not in allowed range: [0, 10]");
+    });
+    it('should throw FloatValidationSpecError with variable name when using custom validator', () => {
+      expect(() => {
+        VFloat.createOrThrow<'custom:is5_1'>('custom:is5_1', 4, 'varName');
+      }).toThrow("Value in 'varName' does not match custom float validator: is5_1");
+    });
+  });
+  describe('create', () => {
+    it('should create a VFloat object successfully when value matches validation spec', () => {
+      const possibleFloat: VFloat<'0.5,10.5'> | null = VFloat.create('0.5,10.5', 5.1);
+      expect(possibleFloat?.value).toEqual(5.1);
+    });
+    it('should return null when value does not match validation spec', () => {
+      const possibleFloat: VFloat<'0.5,10.5'> | null = VFloat.create('0.5,10.5', 0.3);
+      expect(possibleFloat).toEqual(null);
     });
   });
 });

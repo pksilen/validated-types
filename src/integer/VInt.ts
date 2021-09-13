@@ -1,6 +1,6 @@
-import IntValidationSpecError from './IntValidationSpecError';
-import IntValidationError from './IntValidationError';
-import { customIntValidators } from './registerCustomIntValidator';
+import VBase from '../base/VBase';
+import ValidationError from '../error/ValidationError';
+import ValidationSpecError from '../error/ValidationSpecError';
 
 export type IntValidationSpec<ValidationSpec extends string> =
   ValidationSpec extends `${infer MinValue},${infer MaxValue},${infer DivisibleByValue}`
@@ -9,9 +9,13 @@ export type IntValidationSpec<ValidationSpec extends string> =
     ? `${MinValue},${MaxValue}`
     : ValidationSpec extends `custom:${infer ValidatorName}`
     ? `custom:${ValidatorName}`
+    : ValidationSpec extends `${infer IntValidatorName}`
+    ? IntValidatorName extends 'positive' | 'negative'
+      ? `${IntValidatorName}`
+      : { errorMessage: `Invalid int validator name: ${IntValidatorName}` }
     : never;
 
-export default class VInt<ValidationSpec extends string> {
+export default class VInt<ValidationSpec extends string> extends VBase {
   private readonly validatedValue: number;
 
   // this will throw if invalid value is given that don't match the validation spec
@@ -35,74 +39,58 @@ export default class VInt<ValidationSpec extends string> {
   }
 
   protected constructor(validationSpec: IntValidationSpec<ValidationSpec>, value: number, varName?: string) {
-    if (validationSpec.startsWith('custom:')) {
-      const [, validatorName] = validationSpec.split(':');
-      if (!customIntValidators[validatorName]) {
-        throw new IntValidationSpecError('Custom int validator not registered with name: ' + validatorName);
-      }
-      if (customIntValidators[validatorName](value)) {
-        this.validatedValue = value;
-        return;
-      } else {
-        throw new IntValidationError(
-          varName
-            ? `Value '${varName}' does not match validator: ${validatorName}`
-            : `Value does not match validator: ${validatorName}`
-        );
-      }
-    }
-
-    const [minValueStr, maxValueStr, divisibleByValueStr] = validationSpec.split(',');
-    let minValue = parseInt(minValueStr, 10);
-    let maxValue = parseInt(maxValueStr, 10);
-    const divisibleByValue = parseInt(divisibleByValueStr, 10);
-
-    if (minValueStr === '') {
-      minValue = Number.MIN_SAFE_INTEGER;
-    }
-
-    if (maxValueStr === '') {
-      maxValue = Number.MAX_SAFE_INTEGER;
-    }
-
-    if (isNaN(minValue)) {
-      throw new IntValidationSpecError('Invalid minValue specified in validation spec');
-    }
-
-    if (isNaN(maxValue)) {
-      throw new IntValidationSpecError('Invalid maxValue specified in validation spec');
-    }
-
-    if (divisibleByValueStr && (isNaN(divisibleByValue) || divisibleByValue === 0)) {
-      throw new IntValidationSpecError('Invalid divisibleByValue specified in validation spec');
-    }
-
-    if (!Number.isInteger(value)) {
-      throw new IntValidationError(
-        varName ? `Value '${varName}'is not an integer` : 'Value is not an integer'
-      );
-    }
-
-    if (value < minValue || value > maxValue) {
-      throw new IntValidationError(
-        varName
-          ? `Value '${varName}' is not in allowed range: [${minValue}, ${maxValue}]`
-          : `Value is not in allowed range: [${minValue}, ${maxValue}]`
-      );
-    }
-
-    if (divisibleByValueStr && value % divisibleByValue !== 0) {
-      throw new IntValidationError(
-        varName
-          ? `Value '${varName}' is not divisible by: ${divisibleByValue}`
-          : `Value is not divisible by: ${divisibleByValue}`
-      );
-    }
-
+    super();
+    VBase.validateNotError(validationSpec);
+    const validationSpecAsStr = validationSpec as string;
+    VBase.validateByCustomValidator(validationSpecAsStr, value, varName);
+    VBase.validateNumericRange(
+      validationSpecAsStr,
+      value,
+      parseInt,
+      [Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER],
+      varName
+    );
+    VBase.validatePositiveValue(validationSpecAsStr, value, varName);
+    VBase.validateNegativeValue(validationSpecAsStr, value, varName);
+    VInt.validateDivisibleByValue(validationSpecAsStr, value, varName);
+    VInt.validateInteger(value, varName);
     this.validatedValue = value;
   }
 
   get value(): number {
     return this.validatedValue;
+  }
+
+  private static validateDivisibleByValue(
+    validationSpec: string,
+    value: number,
+    varName?: string
+  ): void | never {
+    if (validationSpec.includes(',')) {
+      const [, , divisibleByValueStr] = validationSpec.split(',');
+      const divisibleByValue = parseInt(divisibleByValueStr, 10);
+
+      if (divisibleByValueStr && (isNaN(divisibleByValue) || divisibleByValue === 0)) {
+        throw new ValidationSpecError(
+          'Invalid divisibleByValue specified in validation spec: ' + validationSpec
+        );
+      }
+
+      if (divisibleByValueStr && value % divisibleByValue !== 0) {
+        throw new ValidationError(
+          varName
+            ? `Value in '${varName}' is not divisible by: ${divisibleByValue}`
+            : `Value is not divisible by: ${divisibleByValue}`
+        );
+      }
+    }
+  }
+
+  private static validateInteger(value: number, varName?: string): void | never {
+    if (!Number.isInteger(value)) {
+      throw new ValidationError(
+        varName ? `Value in '${varName}' is not an integer` : 'Value is not an integer'
+      );
+    }
   }
 }

@@ -1,10 +1,10 @@
 import { UnknownLengthStringValidatorNames } from './UnknownLengthStringValidatorNames';
 import { KnownLengthStringValidatorNames } from './KnownLengthStringValidatorNames';
 import { ParameterizedStringValidatorNames } from './ParameterizedStringValidatorNames';
-import StringValidationError from './StringValidationError';
-import { customStringValidators } from './registerCustomStringValidator';
-import StringValidationSpecError from './StringValidationSpecError';
 import { stringValidators } from './stringValidators';
+import VBase from '../base/VBase';
+import ValidationSpecError from '../error/ValidationSpecError';
+import ValidationError from '../error/ValidationError';
 
 export type StringValidationSpecWithLength<ValidationSpec extends string | undefined> =
   ValidationSpec extends undefined
@@ -51,7 +51,7 @@ export default class VString<
   ValidationSpec3 extends string | undefined = undefined,
   ValidationSpec4 extends string | undefined = undefined,
   ValidationSpec5 extends string | undefined = undefined
-> {
+> extends VBase {
   private validatedValue: string = '';
 
   // this will throw if invalid value is given that don't match the validation spec
@@ -269,13 +269,12 @@ export default class VString<
     value: string,
     varName?: string
   ) {
+    super();
     const [validationSpecWithLength, ...otherValidationSpecs] = validationSpecs;
     this.validateValueWithValidationSpec(validationSpecWithLength, value, varName, true);
-
     otherValidationSpecs.forEach((validationSpec) => {
       this.validateValueWithValidationSpec(validationSpec, value, varName, false);
     });
-
     this.validatedValue = value;
   }
 
@@ -296,55 +295,67 @@ export default class VString<
     }
 
     if (typeof validationSpec === 'object') {
-      throw new StringValidationSpecError(validationSpec.errorMessage);
+      throw new ValidationSpecError(validationSpec.errorMessage);
     }
 
-    if (validationSpec.startsWith('custom:')) {
-      const [, validatorName] = validationSpec.split(':');
-      if (!customStringValidators[validatorName]) {
-        throw new StringValidationSpecError(
-          'Custom string validator not registered with name: ' + validatorName
-        );
+    if (shouldValidateLength) {
+      VString.validateLength(validationSpec as string, value, varName);
+    }
+
+    VBase.validateByCustomValidator(validationSpec as string, value, varName);
+    VString.validateByValidator(validationSpec as string, value, shouldValidateLength, varName);
+    this.validatedValue = value;
+  }
+
+  private static validateLength(validationSpec: string, value: string, varName?: string): void | never {
+    if (validationSpec.includes(',')) {
+      const [minLengthStr, maxLengthStr] = validationSpec.split(',');
+      let minLength = parseInt(minLengthStr, 10);
+      const maxLength = parseInt(maxLengthStr, 10);
+
+      if (minLengthStr === '') {
+        minLength = 0;
       }
-      if (customStringValidators[validatorName](value)) {
-        this.validatedValue = value;
-        return;
-      } else {
-        throw new StringValidationError(
+
+      if (isNaN(minLength)) {
+        throw new ValidationSpecError('Invalid minLength specified in validation spec');
+      }
+
+      if (isNaN(maxLength)) {
+        throw new ValidationSpecError('Invalid maxLength specified in validation spec');
+      }
+
+      if (value.length < minLength) {
+        throw new ValidationError(
           varName
-            ? `Value '${varName}' does not match validator: ${validatorName}`
-            : `Value does not match validator: ${validatorName}`
+            ? `Value '${varName}' is shorter than required minimum length: ${minLength}`
+            : `Value is shorter than required minimum length: ${minLength}`
+        );
+      }
+
+      if (value.length > maxLength) {
+        throw new ValidationError(
+          varName
+            ? `Value '${varName}' is longer than allowed maximum length: ${maxLength}`
+            : `Value is longer than allowed maximum length: ${maxLength}`
         );
       }
     }
+  }
 
-    let minLength = 0;
-    let maxLength = Number.MAX_SAFE_INTEGER;
-    let validatorName: string;
-    let parameter;
+  private static validateByValidator(
+    validationSpec: string,
+    value: string,
+    shouldValidateLength: boolean,
+    varName?: string
+  ): void | number {
+    let validatorName, parameter;
 
     if (validationSpec.includes(',')) {
       if (shouldValidateLength) {
-        let minLengthStr;
-        let maxLengthStr;
         let restOfParameter;
-        [minLengthStr, maxLengthStr, validatorName, parameter, ...restOfParameter] =
-          validationSpec.split(',');
+        [, , validatorName, parameter, ...restOfParameter] = validationSpec.split(',');
         parameter = restOfParameter.length > 0 ? parameter + ',' + restOfParameter.join(',') : parameter;
-        minLength = parseInt(minLengthStr, 10);
-        maxLength = parseInt(maxLengthStr, 10);
-
-        if (minLengthStr === '') {
-          minLength = 0;
-        }
-
-        if (isNaN(minLength)) {
-          throw new StringValidationSpecError('Invalid minLength specified in validation spec');
-        }
-
-        if (isNaN(maxLength)) {
-          throw new StringValidationSpecError('Invalid maxLength specified in validation spec');
-        }
       } else {
         [validatorName, parameter] = validationSpec.split(',');
       }
@@ -353,27 +364,11 @@ export default class VString<
     }
 
     if (validatorName && !(stringValidators as any)[validatorName]) {
-      throw new StringValidationSpecError('Invalid string validator name: ' + validatorName);
-    }
-
-    if (value.length < minLength) {
-      throw new StringValidationError(
-        varName
-          ? `Value '${varName}' is shorter than required minimum length: ${minLength}`
-          : `Value is shorter than required minimum length: ${minLength}`
-      );
-    }
-
-    if (value.length > maxLength) {
-      throw new StringValidationError(
-        varName
-          ? `Value '${varName}' is longer than allowed maximum length: ${maxLength}`
-          : `Value is longer than allowed maximum length: ${maxLength}`
-      );
+      throw new ValidationSpecError('Invalid string validator name: ' + validatorName);
     }
 
     if (validatorName && !(stringValidators as any)[validatorName](value, parameter)) {
-      throw new StringValidationError(
+      throw new ValidationError(
         varName
           ? `Value '${varName}' does not match validator: ${validatorName}`
           : `Value does not match validator: ${validatorName}`

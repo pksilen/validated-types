@@ -1,1 +1,1 @@
-export default abstract class ValidationError extends Error {}
+export default class ValidationError extends Error {}
