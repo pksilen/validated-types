@@ -222,12 +222,11 @@ This method is useful for Go language style of programming where you get a 2-tup
 For example:
 
 ```ts
-const [int, err] = VInt<'1,10'>.createOrError('1,10', 1);
+const [float, err] = VFloat.createOrError<'1,10'>('1,10', 1);
 if (err) {
   // handle error here
 }
 ```
-
 
 #### value()
 Returns the valid float value.
@@ -266,10 +265,20 @@ If `maxValue` is missing, `Number.MAX_SAFE_INTEGER` is used.
 If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 
 #### VInt.create()
-Same as `VInt.createOrThrow`, but instead of throwing, it returns `null`
+Same as `VInt.createOrThrow`, but instead of throwing, it returns `null`.
+This method is useful if you don't care about the error message, but just want to know if validation succeeded or not.
 
 #### VInt.createOrError()
 Same as `VInt.createOrThrow`, but instead of throwing, it returns a tuple `[VInt, null]` on success and tuple `[null, Error]` on validation failure
+This method is useful for Go language style of programming where you get a 2-tuple return value where the last element in tuple contains the possible error.
+For example:
+
+```ts
+const [int, err] = VInt.createOrError<'1,10'>('1,10', 1);
+if (err) {
+  // handle error here
+}
+```
 
 #### value()
 Returns the valid integer value.
@@ -377,10 +386,20 @@ If `minLength` is missing, 0 is used.
 If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 
 #### VString.create()
-Same as `VString.createOrThrow`, but instead of throwing, it returns `null`
+Same as `VString.createOrThrow`, but instead of throwing, it returns `null`.
+This method is useful if you don't care about the error message, but just want to know if validation succeeded or not.
 
 #### VString.createOrError()
 Same as `VString.createOrThrow`, but instead of throwing, it returns a tuple `[VString, null]` on success and tuple `[null, Error]` on validation failure
+This method is useful for Go language style of programming where you get a 2-tuple return value where the last element in tuple contains the possible error.
+For example:
+
+```ts
+const [str, err] = VString.createOrError<'1,10'>('1,10', 'abc');
+if (err) {
+  // handle error here
+}
+```
 
 #### value()
 Returns the valid string value.
@@ -408,8 +427,6 @@ const url: Url = VString.createOrThrow(urlVSpec, 'https://server.domain.com:8080
 If you want to report a bug, please [create a new issue](https://github.com/pksilen/validated-types/issues) about that.
 
 If you want to request a new feature, for example, a new type of validator for string, please [create a new issue](https://github.com/pksilen/validated-types/issues) about that.
-
-
 
 [license-badge]: https://img.shields.io/badge/license-MIT-green
 [license]: https://github.com/pksilen/validated-types/blob/master/LICENSE
