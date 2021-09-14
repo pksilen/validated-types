@@ -15,6 +15,7 @@
     - [VInt](#vint)
     - [VString](#vstring)
     - [VSpecOf](#vspecof)
+  - [Feedback](#feedback)
 
 ## <a name="installation"></a> Installation
 
@@ -105,7 +106,7 @@ Below example contains 4 validators that validate following string:
 import { SpecOf, VString } from 'validated-types';
 
 type Url = VString<['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html']>;
-const urlSpec: VSpecOf<Url> = ['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html'];
+const urlVSpec: VSpecOf<Url> = ['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html'];
 
 function useUrl(url: Url) {
   // use URL here
@@ -113,7 +114,7 @@ function useUrl(url: Url) {
 }
 
 const url: Url = VString.createOrThrow(urlSpec, 'https://server.domain.com:8080/index.html');
-const possibleUrl: Url | null = VString.create(urlSpec, 'invalid URL');
+const possibleUrl: Url | null = VString.create(urlVSpec, 'invalid URL');
 
 useUrl(url); // prints to console: https://server.domain.com:8080/index.html
 useUrl(possibleUrl ?? VString.create(urlSpec, 'https://server.domain.com:8080/index.html')); // prints to console: https://server.domain.com:8080/index.html
@@ -212,10 +213,21 @@ If `maxValue` is missing, `Number.MAX_VALUE` is used.
 If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 
 #### VFloat.create()
-Same as `VFloat.createOrThrow`, but instead of throwing, it returns `null`
+Same as `VFloat.createOrThrow`, but instead of throwing, it returns `null`.
+This method is useful if you don't care about the error message, but just want to know if validation succeeded or not.
 
 #### VFloat.createOrError()
-Same as `VFloat.createOrThrow`, but instead of throwing, it returns a tuple `[VFloat, null]` on success and tuple `[null, Error]` on validation failure
+Same as `VFloat.createOrThrow`, but instead of throwing, it returns a tuple `[VFloat, null]` on success and tuple `[null, Error]` on validation failure.
+This method is useful for Go language style of programming where you get a 2-tuple return value where the last element in tuple contains the possible error.
+For example:
+
+```ts
+const [int, err] = VInt<'1,10'>.createOrError('1,10', 1);
+if (err) {
+  // handle error here
+}
+```
+
 
 #### value()
 Returns the valid float value.
@@ -380,17 +392,23 @@ Extracts the validation spec type of the validated type.
 For example:
 ```ts
 type Month = VInt<'1,12'>);
-const monthSpec: VSpecOf<Month> = '1,12';
-const month: Month = VInt.createOrThrow(monthSpec, 1);
+const monthVSpec: VSpecOf<Month> = '1,12';
+const month: Month = VInt.createOrThrow(monthVSpec, 1);
 
 type Percent = VFloat<'0,100'>;
-const percentSpec: VSpecOf<Percent> = '0,100';
-const percent: Percent = VFloat.createOrThrow(percentSpec, 25.0);
+const percentVSpec: VSpecOf<Percent> = '0,100';
+const percent: Percent = VFloat.createOrThrow(percentVSpec, 25.0);
 
 type Url = VString<['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html']>;
-const urlSpec: VSpecOf<Url> = ['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html'];
-const url: Url = VString.createOrThrow(urlSpec, 'https://server.domain.com:8080/index.html');
+const urlVSpec: VSpecOf<Url> = ['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html'];
+const url: Url = VString.createOrThrow(urlVSpec, 'https://server.domain.com:8080/index.html');
 ```
+
+## <a name="feedback"></a> Feedback
+If you want to report a bug, please [create a new issue](https://github.com/pksilen/validated-types/issues) about that.
+
+If you want to request a new feature, for example, a new type of validator for string, please [create a new issue](https://github.com/pksilen/validated-types/issues) about that.
+
 
 
 [license-badge]: https://img.shields.io/badge/license-MIT-green
