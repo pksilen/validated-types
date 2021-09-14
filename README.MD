@@ -214,7 +214,7 @@ If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 Same as `VFloat.createOrThrow`, but instead of throwing, it returns `null`
 
 #### VFloat.createOrError()
-Same as `VFloat.createOrThrow`, but instead of throwing, it returns a tuple either `[VFloat, null]` or `[null, Error]`
+Same as `VFloat.createOrThrow`, but instead of throwing, it returns a tuple  `[VFloat, null]` on success and tuple `[null, Error]` on validation failure
 
 #### value()
 Returns the valid float value.
