@@ -1,6 +1,6 @@
 # validated-types
 
-`validated-types` is a library for Typescript to validate integer, float, string and array values
+`validated-types` is a library for Typescript to validate integer, float, string and array values with 100% unit test coverage
 
 [![version][version-badge]][package]
 [![build][build]][circleci]
@@ -14,7 +14,7 @@
     - [VFloat](#vfloat)
     - [VInt](#vint)
     - [VString](#vstring)
-    - [SpecOf](#specof)
+    - [VSpecOf](#vspecof)
 
 ## <a name="installation"></a> Installation
 
@@ -105,7 +105,7 @@ Below example contains 4 validators that validate following string:
 import { SpecOf, VString } from 'validated-types';
 
 type Url = VString<['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html']>;
-const urlSpec: SpecOf<Url> = ['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html'];
+const urlSpec: VSpecOf<Url> = ['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html'];
 
 function useUrl(url: Url) {
   // use URL here
@@ -233,7 +233,7 @@ class VInt {
 ```
 
 #### VInt.registerCustomValidator()
-Registers a custom validator with given name. `validateFunc` receives a float value as parameter and returns boolean based on success of validation.
+Registers a custom validator with given name. `validateFunc` receives a number as parameter and returns boolean based on success of validation.
 
 #### VInt.createOrThrow()
 Creates a new validated integer value object or throws a `ValidationError` exception if supplied value is invalid.
@@ -264,7 +264,113 @@ Returns the valid integer value.
 
 ### <a name="vstring"></a> VString
 
-### <a name="specof"></a> SpecOf
+```ts
+class VString {
+  static registerCustomValidator(validatorName: string, validateFunc: (value: string) => boolean): void;
+  static createOrThrow(validationSpec: string, value: number, varName?: string): VString | never;
+  static create(validationSpec: string, value: number, varName?: string): VString | null;
+  static createOrError(validationSpec: string, value: number, varName?: string): [VString<VSpec>, null] | [null, Error];
+  value(): string;
+}
+```
+
+#### VString.registerCustomValidator()
+Registers a custom validator with given name. `validateFunc` receives a string value as parameter and returns boolean based on success of validation.
+
+#### VString.createOrThrow()
+Creates a new validated integer value object or throws a `ValidationError` exception if supplied value is invalid.
+`validationSpec` is a string of following form `'[<minLength>],<maxLength>[,<unknown_length_validator_name>[,<parameter>]] | <known_length_validator_name> | custom:<custom_validator_name>'`.
+
+Possible value for `<unknown_length_validator_name>`:
+ * alpha         
+ * alphanumeric  
+ * ascii         
+ * base32        
+ * base58        
+ * base64        
+ * dataUri       
+ * decimal       
+ * fqdn          
+ * md4           
+ * md5           
+ * sha1          
+ * sha256        
+ * sha384        
+ * sha512        
+ * crc32         
+ * crc32b        
+ * hex           
+ * ipv4Range    
+ * ipv6Range     
+ * json          
+ * lowercase    
+ * magnetUri    
+ * mongoId
+ * numeric       
+ * octal         
+ * uppercase  
+ * strongPassword
+ * url
+ * includes (requires `parameter`)
+ * match (requires a RegExp string `parameter`)
+ * isOneOf (requires JSON string array `parameter`)
+ * isNoneOf (requires JSON string array `parameter`)
+ * startsWith (requires `parameter`)
+ * endsWith (requires `parameter`)
+
+Possible values for `<known_length_validator_name>`:
+ * boolean             
+ * bic                 
+ * btcAddress          
+ * creditCard          
+ * ean                 
+ * email              
+ * ethereumAddress     
+ * hsl                 
+ * hexColor           
+ * isin                
+ * iban               
+ * ipv4                
+ * ipv6                
+ * iso31661Alpha2    
+ * iso31661Alpha3     
+ * iso8601           
+ * isrc               
+ * issn              
+ * jwt               
+ * latLong             
+ * macAddress         
+ * mimeType           
+ * port              
+ * rgbColor           
+ * semVer              
+ * uuid                
+ * postalCode         
+ * creditCardExpiration
+ * cvc               
+ * mobileNumber
+
+`validationSpec` examples:
+* '0,100'
+* ',100'
+* '1,1024,url'
+* '1,1024,startsWith,https'
+* 'email'
+* 'custom:isSupplierName'
+
+If `minLength` is missing, 0 is used.
+If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
+
+#### VString.create()
+Same as `VString.createOrThrow`, but instead of throwing, it returns `null`
+
+#### VString.createOrError()
+Same as `VString.createOrThrow`, but instead of throwing, it returns a tuple `[VString, null]` on success and tuple `[null, Error]` on validation failure
+
+#### value()
+Returns the valid string value.
+
+### <a name="vspecof"></a> VSpecOf
 
 [license-badge]: https://img.shields.io/badge/license-MIT-green
 [license]: https://github.com/pksilen/validated-types/blob/master/LICENSE

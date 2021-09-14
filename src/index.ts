@@ -3,4 +3,4 @@ export { default as ValidationSpecError } from './error/ValidationSpecError';
 export { default as VFloat } from './float/VFloat';
 export { default as VInt } from './integer/VInt';
 export { default as VString } from './string/VString';
-export { SpecOf } from './base/SpecOf';
+export { VSpecOf } from './base/VSpecOf';
