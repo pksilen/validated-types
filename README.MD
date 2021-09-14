@@ -34,12 +34,13 @@ useInt(possibleInt ?? VInt.create('1,10', 10));
 ```
 
 You can also register a custom validator:
+
 ```ts
 import { VInt } from 'validated-types';
 
-VInt.registerCustomValidator('isEven', (value) => value % 2 === 0 )
+VInt.registerCustomValidator('isEven', (value) => value % 2 === 0);
 
-const evenNumber : VInt<'custom:isEven'> = VInt.createOrThrow('custom:isEven', 2);
+const evenNumber: VInt<'custom:isEven'> = VInt.createOrThrow('custom:isEven', 2);
 const possibleEvenNumber: VInt<'custom:isEven'> | null = VInt.create('custom:isEven', 1);
 ```
 
@@ -83,16 +84,18 @@ useUrl(possibleUrl ?? VString.create('1,1024,url', 'https://google.com'));
 
 You can combine up to 5 different string validators together. Multiple validators are given as a tuple which can have 2-5 elements. The first element of the tuple should validate the length of the string, if needed. Rest of the elements in tuple should not validate the length of string anymore.
 Below example contains 4 validators that validate following string:
-* is at least 1 characters long
-* is at most 1024 characters long
-* is lower case string
-* is valid URL
-* URL starts with *https*
-* URL ends with *.html*
+
+- is at least 1 characters long
+- is at most 1024 characters long
+- is lower case string
+- is valid URL
+- URL starts with _https_
+- URL ends with _.html_
+
 ```ts
 import { SpecOf, VString } from 'validated-types';
 
-type Url = VString<['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html']> 
+type Url = VString<['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html']>;
 const urlSpec: SpecOf<Url> = ['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html'];
 
 function useUrl(url: Url) {
@@ -114,40 +117,44 @@ so there is no performance penalty in using the validated values as many times a
 You should create the validated int/float/string objects (i.e. VInt/VFloat/VString objects) in functions that receive unvalidated input data and then pass the validated values to the rest of the functions in your application.
 
 Your application typically receives unvalidated input data from external sources in following scenarios:
-* Reading command line arguments
-* Reading environment variables
-* Reading standard input
-* Reading file(s) from file system
-* Reading data from socket (network input)
-* End-user input from user interface
+
+- Reading command line arguments
+- Reading environment variables
+- Reading standard input
+- Reading file(s) from file system
+- Reading data from socket (network input)
+- End-user input from user interface
 
 You can also create validated objects, for example:
+
 ```ts
 type Person = {
-  firstName: VString<1,64>;
-  lastName: VString<1,64>;
-  nickNames: VString<1,64>[];
+  firstName: VString<1, 64>;
+  lastName: VString<1, 64>;
+  nickNames: VString<1, 64>[];
   email: VString<'email'>;
   password: VString<'8,1024,strongPassword'>;
-  age: VInt<0,255>;
+  age: VInt<0, 255>;
   interestPercent: VFloat<'0,100'>;
-}
+};
 ```
 
 You can assign type aliases to your validated types:
 
 types.ts
+
 ```ts
 import { VFloat, VInt, VString } from 'validated-types';
 
-export type Name = VString<1,64>;
+export type Name = VString<1, 64>;
 export type Email = VString<'email'>;
-export type Password = VString<'8,1024,strongPassword'>
-export type Age = VInt<0,255>;
+export type Password = VString<'8,1024,strongPassword'>;
+export type Age = VInt<0, 255>;
 export type Percent = VFloat<'0,100'>;
 ```
 
 person.ts
+
 ```ts
 import { Age, Email, Name, Password, Percent } from 'types';
 
@@ -159,7 +166,7 @@ type Person = {
   password: Password;
   age: Age;
   interestPercent: Percent;
-}
+};
 ```
 
 [license-badge]: https://img.shields.io/badge/license-MIT-green
@@ -182,3 +189,23 @@ class VFloat {
   value(): number;
 }
 ```
+
+#### VFloat.registerCustomValidator
+Registers a custom validator with given name. `validateFunc` receives a float value as parameter and returns boolean based on success of validation.
+
+#### VFloat.createOrThrow
+Creates a new validated float value object or throws a `ValidationError` exception if supplied value is invalid.
+validationSpec is a string of following form '[<minValue>],[<maxValue>] | negative | positive | custom:<custom_validator_name>'.
+ValidationSpec examples:
+ * '0,100'
+ * '100,'
+ * ',0'
+ * 'positive'
+ * 'negative'
+ * 'custom:isUsShoeSize'
+If minValue is missing, Number.MIN_VALUE is used.
+If maxValue is missing, Number.MAX_VALUE is used.
+If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
+
+#### VFloat.create
+Same as `VFloat.createOrThrow`, but instead of throwing, it returns `null`
