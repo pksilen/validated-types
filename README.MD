@@ -81,7 +81,8 @@ useUrl(url);
 useUrl(possibleUrl ?? VString.create('1,1024,url', 'https://google.com'));
 ```
 
-You can combine up to 5 different string validators together. Below example validates following string:
+You can combine up to 5 different string validators together. Multiple validators are given as a tuple which can have 2-5 elements. The first element of the tuple should validate the length of the string, if needed. Rest of the elements in tuple should not validate the length of string anymore.
+Below example contains 4 validators that validate following string:
 * is at least 1 characters long
 * is at most 1024 characters long
 * is lower case string
@@ -106,7 +107,7 @@ useUrl(url);
 useUrl(possibleUrl ?? VString.create(urlSpec, 'https://server.domain.com:8080/index.html'));
 ```
 
-By using validated types for the parameters of  your application's functions', you can rest assured that only proper values are ever passed to your function.
+By using validated types for the parameters of your application's functions, you can rest assured that only proper values are ever passed to your function.
 You don't have to do any validation work inside your functions, just use the value of already validated parameter. The validation of the value is done only once upon the construction of validated objects,
 so there is no performance penalty in using the validated values as many times as you need.
 
