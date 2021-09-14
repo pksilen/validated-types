@@ -1,7 +1,7 @@
 // noinspection MagicNumberJS
 
 import VString from './VString';
-import { SpecOf } from '../base/SpecOf';
+import { VSpecOf } from '../base/VSpecOf';
 
 VString.registerCustomValidator('is5', (value) => value === '5');
 
@@ -25,7 +25,7 @@ describe('VString', () => {
     });
     it('should create a VString object successfully when value matches multiple validation specs', () => {
       type Url = VString<['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html']>;
-      const urlSpec: SpecOf<Url> = ['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'];
+      const urlSpec: VSpecOf<Url> = ['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'];
 
       const string: Url = VString.createOrThrow(urlSpec, 'https://apiserver.domain.com:8080/index.html');
 
@@ -152,6 +152,18 @@ describe('VString', () => {
     it('should return null when value does not match validation spec', () => {
       const possibleString: VString<'0,5'> | null = VString.create('0,5', 'abc1234');
       expect(possibleString).toEqual(null);
+    });
+  });
+  describe('createOrError', () => {
+    it('should create a VString object successfully when value matches validation spec', () => {
+      const [string, error]: [VString<'0,10'>, null] | [null, Error] = VString.createOrError('0,10', 'abc');
+      expect(string?.value).toEqual('abc');
+      expect(error).toBeNull();
+    });
+    it('should return null when value does not match validation spec', () => {
+      const [string, error]: [VString<'5,10'>, null] | [null, Error] = VString.createOrError('5,10', 'abc');
+      expect(string).toBeNull();
+      expect(error).toBeInstanceOf(Error);
     });
   });
 });

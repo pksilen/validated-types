@@ -205,6 +205,85 @@ export default class VString<ValidationSpec extends string | string[]> extends V
     }
   }
 
+  static createOrError<VSpec extends string>(
+    validationSpec: StringValidationSpecWithLength<VSpec>,
+    value: string,
+    varName?: string
+  ): [VString<VSpec>, null] | [null, Error];
+
+  static createOrError<VSpec extends [string, string]>(
+    validationSpec: [StringValidationSpecWithLength<VSpec[0]>, StringValidationSpec<VSpec[1]>],
+    value: string,
+    varName?: string
+  ): [VString<VSpec>, null] | [null, Error];
+
+  static createOrError<VSpec extends [string, string, string]>(
+    validationSpec: [
+      StringValidationSpecWithLength<VSpec[0]>,
+      StringValidationSpec<VSpec[1]>,
+      StringValidationSpec<VSpec[2]>
+    ],
+    value: string,
+    varName?: string
+  ): [VString<VSpec>, null] | [null, Error];
+
+  static createOrError<VSpec extends [string, string, string, string]>(
+    validationSpec: [
+      StringValidationSpecWithLength<VSpec[0]>,
+      StringValidationSpec<VSpec[1]>,
+      StringValidationSpec<VSpec[2]>,
+      StringValidationSpec<VSpec[3]>
+    ],
+    value: string,
+    varName?: string
+  ): [VString<VSpec>, null] | [null, Error];
+
+  static createOrError<VSpec extends [string, string, string, string, string]>(
+    validationSpec: [
+      StringValidationSpecWithLength<VSpec[0]>,
+      StringValidationSpec<VSpec[1]>,
+      StringValidationSpec<VSpec[2]>,
+      StringValidationSpec<VSpec[3]>,
+      StringValidationSpec<VSpec[4]>
+    ],
+    value: string,
+    varName?: string
+  ): [VString<VSpec>, null] | [null, Error];
+
+  static createOrError<VSpec extends string | string[]>(
+    validationSpec: VSpec extends string
+      ? StringValidationSpecWithLength<VSpec>
+      :
+          | [
+              StringValidationSpecWithLength<VSpec[0]>,
+              StringValidationSpec<VSpec[1]>,
+              StringValidationSpec<VSpec[2]>,
+              StringValidationSpec<VSpec[3]>,
+              StringValidationSpec<VSpec[4]>
+            ]
+          | [
+              StringValidationSpecWithLength<VSpec[0]>,
+              StringValidationSpec<VSpec[1]>,
+              StringValidationSpec<VSpec[2]>,
+              StringValidationSpec<VSpec[3]>
+            ]
+          | [
+              StringValidationSpecWithLength<VSpec[0]>,
+              StringValidationSpec<VSpec[1]>,
+              StringValidationSpec<VSpec[2]>
+            ]
+          | [StringValidationSpecWithLength<VSpec[0]>, StringValidationSpec<VSpec[1]>],
+
+    value: string,
+    varName?: string
+  ): [VString<VSpec>, null] | [null, Error] {
+    try {
+      return [new VString<VSpec>(validationSpec, value, varName), null];
+    } catch (error) {
+      return [null, error as Error];
+    }
+  }
+
   protected constructor(
     validationSpec: ValidationSpec extends string
       ? StringValidationSpecWithLength<ValidationSpec>

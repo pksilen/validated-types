@@ -1,6 +1,6 @@
 # validated-types
 
-`validated-types` is a library for Typescript to validate integer, float, string and array values with 100% unit test coverage
+`validated-types` is a library for Typescript to validate integer, float, string and array values.
 
 [![version][version-badge]][package]
 [![build][build]][circleci]
@@ -375,7 +375,7 @@ Returns the valid string value.
 
 ### <a name="vspecof"></a> VSpecOf
 
-Extracts the validation spec type of validated type.
+Extracts the validation spec type of the validated type.
 
 For example:
 ```ts
