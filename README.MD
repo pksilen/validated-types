@@ -350,6 +350,8 @@ Possible values for `<known_length_validator_name>`:
  * cvc               
  * mobileNumber
 
+More information about validators can be found [validator.js documentation](https://github.com/validatorjs/validator.js/)
+
 `validationSpec` examples:
 * '0,100'
 * ',100'
