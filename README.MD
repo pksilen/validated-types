@@ -90,9 +90,9 @@ Below example contains 4 validators that validate following string:
 * URL starts with *https*
 * URL ends with *.html*
 ```ts
-import { SpecOf, VInt } from 'validated-types';
+import { SpecOf, VString } from 'validated-types';
 
-type Url = ['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html'] 
+type Url = VString<['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html']> 
 const urlSpec: SpecOf<Url> = ['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html'];
 
 function useUrl(url: Url) {
@@ -169,3 +169,16 @@ type Person = {
 [downloads]: https://img.shields.io/npm/dm/validated-types
 [build]: https://img.shields.io/circleci/project/github/pksilen/validated-types/master.svg?style=flat-square
 [circleci]: https://circleci.com/gh/pksilen/validated-types/tree/master
+
+## API documentation
+
+### VFloat
+
+```ts
+class VFloat {
+  static registerCustomValidator(validatorName: string, validateFunc: (value: number) => boolean): void;
+  static createOrThrow(validationSpec: string, value: number, varName?: string): VFloat | never;
+  static create(validationSpec: string, value: number, varName?: string): VFloat | null;
+  value(): number;
+}
+```
