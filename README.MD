@@ -195,8 +195,8 @@ Registers a custom validator with given name. `validateFunc` receives a float va
 
 #### VFloat.createOrThrow
 Creates a new validated float value object or throws a `ValidationError` exception if supplied value is invalid.
-validationSpec is a string of following form `'[<minValue>],[<maxValue>] | negative | positive | custom:<custom_validator_name>'`.
-ValidationSpec examples:
+`validationSpec` is a string of following form `'[<minValue>],[<maxValue>] | negative | positive | custom:<custom_validator_name>'`.
+`validationSpec` examples:
  * '0,100'
  * '100,'
  * ',0'
