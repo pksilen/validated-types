@@ -117,7 +117,7 @@ const url: Url = VString.createOrThrow(urlSpec, 'https://server.domain.com:8080/
 const possibleUrl: Url | null = VString.create(urlVSpec, 'invalid URL');
 
 useUrl(url); // prints to console: https://server.domain.com:8080/index.html
-useUrl(possibleUrl ?? VString.create(urlSpec, 'https://server.domain.com:8080/index.html')); // prints to console: https://server.domain.com:8080/index.html
+useUrl(possibleUrl ?? VString.create(urlVSpec, 'https://server.domain.com:8080/index.html')); // prints to console: https://server.domain.com:8080/index.html
 ```
 
 By using validated types for the parameters of your application's functions, you can rest assured that only proper values are ever passed to your function.
@@ -213,11 +213,11 @@ If `maxValue` is missing, `Number.MAX_VALUE` is used.
 If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 
 #### VFloat.create()
-Same as `VFloat.createOrThrow`, but instead of throwing, it returns `null`.
+Same as `VFloat.createOrThrow`, but instead of throwing on validation failure, it returns `null`.
 This method is useful if you don't care about the error message, but just want to know if validation succeeded or not.
 
 #### VFloat.createOrError()
-Same as `VFloat.createOrThrow`, but instead of throwing, it returns a tuple `[VFloat, null]` on success and tuple `[null, Error]` on validation failure.
+Same as `VFloat.createOrThrow`, but instead of throwing on validation failure, it returns a tuple `[VFloat, null]` on success and tuple `[null, Error]` on validation failure.
 This method is useful for Go language style of programming where you get a 2-tuple return value where the last element in tuple contains the possible error.
 For example:
 
@@ -265,11 +265,11 @@ If `maxValue` is missing, `Number.MAX_SAFE_INTEGER` is used.
 If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 
 #### VInt.create()
-Same as `VInt.createOrThrow`, but instead of throwing, it returns `null`.
+Same as `VInt.createOrThrow`, but instead of throwing on validation failure, it returns `null`.
 This method is useful if you don't care about the error message, but just want to know if validation succeeded or not.
 
 #### VInt.createOrError()
-Same as `VInt.createOrThrow`, but instead of throwing, it returns a tuple `[VInt, null]` on success and tuple `[null, Error]` on validation failure
+Same as `VInt.createOrThrow`, but instead of throwing on validation failure, it returns a tuple `[VInt, null]` on success and tuple `[null, Error]` on validation failure
 This method is useful for Go language style of programming where you get a 2-tuple return value where the last element in tuple contains the possible error.
 For example:
 
@@ -386,11 +386,11 @@ If `minLength` is missing, 0 is used.
 If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 
 #### VString.create()
-Same as `VString.createOrThrow`, but instead of throwing, it returns `null`.
+Same as `VString.createOrThrow`, but instead of throwing on validation failure, it returns `null`.
 This method is useful if you don't care about the error message, but just want to know if validation succeeded or not.
 
 #### VString.createOrError()
-Same as `VString.createOrThrow`, but instead of throwing, it returns a tuple `[VString, null]` on success and tuple `[null, Error]` on validation failure
+Same as `VString.createOrThrow`, but instead of throwing on validation failure, it returns a tuple `[VString, null]` on success and tuple `[null, Error]` on validation failure
 This method is useful for Go language style of programming where you get a 2-tuple return value where the last element in tuple contains the possible error.
 For example:
 
