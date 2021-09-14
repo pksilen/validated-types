@@ -1,6 +1,7 @@
 // noinspection MagicNumberJS
 
 import VString from './VString';
+import { SpecOf } from '../base/SpecOf';
 
 VString.registerCustomValidator('is5', (value) => value === '5');
 
@@ -23,11 +24,10 @@ describe('VString', () => {
       expect(string.value).toEqual(' abc');
     });
     it('should create a VString object successfully when value matches multiple validation specs', () => {
-      const string: VString<['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html']> =
-        VString.createOrThrow(
-          ['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'],
-          'https://apiserver.domain.com:8080/index.html'
-        );
+      type Url = VString<['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html']>;
+      const urlSpec: SpecOf<Url> = ['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'];
+
+      const string: Url = VString.createOrThrow(urlSpec, 'https://apiserver.domain.com:8080/index.html');
 
       expect(string.value).toEqual('https://apiserver.domain.com:8080/index.html');
     });
