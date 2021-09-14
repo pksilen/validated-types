@@ -39,7 +39,7 @@ export default class VFloat<ValidationSpec extends string> extends VBase {
     validationSpec: FloatValidationSpec<VSpec>,
     value: number,
     varName?: string
-  ): [VFloat<VSpec> | null, Error | null] {
+  ): [VFloat<VSpec>, null] | [null, Error] {
     try {
       return [new VFloat<VSpec>(validationSpec, value, varName), null];
     } catch (error) {

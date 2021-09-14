@@ -186,7 +186,7 @@ class VFloat {
   static registerCustomValidator(validatorName: string, validateFunc: (value: number) => boolean): void;
   static createOrThrow(validationSpec: string, value: number, varName?: string): VFloat | never;
   static create(validationSpec: string, value: number, varName?: string): VFloat | null;
-  static createOrError(validationSpec: string, value: number, varName?: string): [VFloat<VSpec> | null, Error | null];
+  static createOrError(validationSpec: string, value: number, varName?: string): [VFloat<VSpec>, null] | [null, Error];
   value(): number;
 }
 ```
