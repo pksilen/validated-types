@@ -74,19 +74,26 @@ function useUrl(url: VString<'1,1024,url'>) {
   console.log(url.value);
 }
 
-const string: VString<'1,1024,url'> = VString.createOrThrow('1,1024,url', 'https://www.mydomain.com');
-const possibleString: VString<'1,1024,url'> | null = VString.create('1,1024,url', 'invalid URL');
+const url: VString<'1,1024,url'> = VString.createOrThrow('1,1024,url', 'https://www.mydomain.com');
+const possibleUrl: VString<'1,1024,url'> | null = VString.create('1,1024,url', 'invalid URL');
 
 useUrl(url);
 useUrl(possibleUrl ?? VString.create('1,1024,url', 'https://google.com'));
 ```
 
-You can combine up to 5 different string validators together, for example:
+You can combine up to 5 different string validators together. Below example validates following string:
+* is at least 1 characters long
+* is at most 1024 characters long
+* is lower case string
+* is valid URL
+* URL starts with 'https'
+* URL ends with '.html
+* '
 ```ts
 import { SpecOf, VInt } from 'validated-types';
 
-type Url = ['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'] 
-const urlSpec: SpecOf<Url> = ['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'];
+type Url = ['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html'] 
+const urlSpec: SpecOf<Url> = ['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html'];
 
 function useUrl(url: Url) {
   // use URL here
@@ -94,18 +101,17 @@ function useUrl(url: Url) {
 }
 
 const url: Url = VString.createOrThrow(urlSpec, 'https://server.domain.com:8080/index.html');
-const possibleString: Url | null = VString.create(urlSpec, 'invalid URL');
+const possibleUrl: Url | null = VString.create(urlSpec, 'invalid URL');
 
 useUrl(url);
 useUrl(possibleUrl ?? VString.create(urlSpec, 'https://server.domain.com:8080/index.html'));
 ```
 
-
 By using validated types for the parameters of  your application's functions', you can rest assured that only proper values are ever passed to your function.
 You don't have to do any validation work inside your functions, just use the value of already validated parameter. The validation of the value is done only once upon the construction of validated objects,
 so there is no performance penalty in using the validated values as many times as you need.
 
-You should create the validated int/float/string objects (VInt/VFloat/VString) in functions that receive unvalidated input data and then pass the validated values to the rest of the functions in your application.
+You should create the validated int/float/string objects (i.e. VInt/VFloat/VString objects) in functions that receive unvalidated input data and then pass the validated values to the rest of the functions in your application.
 
 Your application typically receives unvalidated input data in following scenarios:
 * Reading command line arguments
@@ -128,15 +134,23 @@ type Person = {
 }
 ```
 
-```ts
-// Defined in types.ts
-type Name = VString<1,64>;
-type Email = VString<'email'>;
-type Password = VString<'8,1024,strongPassword'>
-type Age = VInt<0,255>;
-type Percent = VFloat<'0,100'>;
+You can assign type aliases to your validated types:
 
-// Defined in Person.ts
+types.ts
+```ts
+import { VFloat, VInt, VString } from 'validated-types';
+
+export type Name = VString<1,64>;
+export type Email = VString<'email'>;
+export type Password = VString<'8,1024,strongPassword'>
+export type Age = VInt<0,255>;
+export type Percent = VFloat<'0,100'>;
+```
+
+person.ts
+```ts
+import { Age, Email, Name, Password, Percent } from 'types';
+
 type Person = {
   firstName: Name;
   lastName: Name;
