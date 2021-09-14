@@ -80,7 +80,7 @@ const evenNumber: VInt<'custom:isEven'> = VInt.createOrThrow('custom:isEven', 2)
 const possibleEvenNumber: VInt<'custom:isEven'> | null = VInt.create('custom:isEven', 1);
 ```
 
-Custom validator must be registered before it is used by any validated types `create` or `createOrThrow` method.
+Custom validator must be registered before it is used by any validated types `create`, `createOrThrow` or `createOrError`method.
 This means that you should register your custom validators as early as possible in your application code.
 If custom validator is not registered, and it is used, an exception will be thrown.
 
@@ -209,6 +209,7 @@ class VFloat {
 
 #### VFloat.registerCustomValidator()
 Registers a custom validator with given name. `validateFunc` receives a float value as parameter and returns boolean based on success of validation.
+You must register your custom validator before using it in any of the `create` functions.
 
 #### VFloat.createOrThrow()
 Creates a new validated float value object or throws a `ValidationError` exception if supplied value is invalid.
@@ -259,6 +260,7 @@ class VInt {
 
 #### VInt.registerCustomValidator()
 Registers a custom validator with given name. `validateFunc` receives a number as parameter and returns boolean based on success of validation.
+You must register your custom validator before using it in any of the `create` functions.
 
 #### VInt.createOrThrow()
 Creates a new validated integer value object or throws a `ValidationError` exception if supplied value is invalid.
@@ -311,6 +313,7 @@ class VString {
 
 #### VString.registerCustomValidator()
 Registers a custom validator with given name. `validateFunc` receives a string value as parameter and returns boolean based on success of validation.
+You must register your custom validator before using it in any of the `create` functions.
 
 #### VString.createOrThrow()
 Creates a new validated integer value object or throws a `ValidationError` exception if supplied value is invalid.
