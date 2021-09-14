@@ -7,9 +7,7 @@ import ValidationSpecError from '../error/ValidationSpecError';
 import ValidationError from '../error/ValidationError';
 
 export type StringValidationSpecWithLength<ValidationSpec extends string | undefined> =
-  ValidationSpec extends undefined
-    ? undefined
-    : ValidationSpec extends `${infer MinLength},${infer MaxLength},${infer StringValidatorName},${infer Parameter}`
+  ValidationSpec extends `${infer MinLength},${infer MaxLength},${infer StringValidatorName},${infer Parameter}`
     ? StringValidatorName extends ParameterizedStringValidatorNames
       ? `${MinLength},${MaxLength},${StringValidatorName},${Parameter}`
       : { errorMessage: `Invalid string validator name: ${StringValidatorName}` }
@@ -27,23 +25,22 @@ export type StringValidationSpecWithLength<ValidationSpec extends string | undef
       : { errorMessage: `Invalid string validator name: ${KnownLengthStringValidatorName}` }
     : never;
 
-export type StringValidationSpec<ValidationSpec extends string | undefined> = ValidationSpec extends undefined
-  ? undefined
-  : ValidationSpec extends `${infer StringValidatorName},${infer Parameter}`
-  ? StringValidatorName extends ParameterizedStringValidatorNames
-    ? `${StringValidatorName},${Parameter}`
-    : { errorMessage: `Invalid string validator name: ${StringValidatorName}` }
-  : ValidationSpec extends `${infer StringValidatorName}`
-  ? StringValidatorName extends UnknownLengthStringValidatorNames
-    ? `${StringValidatorName}`
-    : { errorMessage: `Invalid string validator name: ${StringValidatorName}` }
-  : ValidationSpec extends `custom:${infer CustomValidatorName}`
-  ? `custom:${CustomValidatorName}`
-  : ValidationSpec extends `${infer KnownLengthStringValidatorName}`
-  ? KnownLengthStringValidatorName extends KnownLengthStringValidatorNames
-    ? `${KnownLengthStringValidatorName}`
-    : { errorMessage: `Invalid string validator name: ${KnownLengthStringValidatorName}` }
-  : never;
+export type StringValidationSpec<ValidationSpec extends string | undefined> =
+  ValidationSpec extends `${infer StringValidatorName},${infer Parameter}`
+    ? StringValidatorName extends ParameterizedStringValidatorNames
+      ? `${StringValidatorName},${Parameter}`
+      : { errorMessage: `Invalid string validator name: ${StringValidatorName}` }
+    : ValidationSpec extends `${infer StringValidatorName}`
+    ? StringValidatorName extends UnknownLengthStringValidatorNames
+      ? `${StringValidatorName}`
+      : { errorMessage: `Invalid string validator name: ${StringValidatorName}` }
+    : ValidationSpec extends `custom:${infer CustomValidatorName}`
+    ? `custom:${CustomValidatorName}`
+    : ValidationSpec extends `${infer KnownLengthStringValidatorName}`
+    ? KnownLengthStringValidatorName extends KnownLengthStringValidatorNames
+      ? `${KnownLengthStringValidatorName}`
+      : { errorMessage: `Invalid string validator name: ${KnownLengthStringValidatorName}` }
+    : never;
 
 export default class VString<ValidationSpec extends string | string[]> extends VBase {
   private readonly validatedValue: string;
@@ -257,10 +254,6 @@ export default class VString<ValidationSpec extends string | string[]> extends V
     varName: string | undefined,
     shouldValidateLength: boolean
   ) {
-    if (validationSpec === undefined) {
-      return;
-    }
-
     if (shouldValidateLength) {
       VString.validateLength(validationSpec, value, varName);
     }

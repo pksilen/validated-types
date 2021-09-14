@@ -113,13 +113,13 @@ so there is no performance penalty in using the validated values as many times a
 
 You should create the validated int/float/string objects (i.e. VInt/VFloat/VString objects) in functions that receive unvalidated input data and then pass the validated values to the rest of the functions in your application.
 
-Your application typically receives unvalidated input data in following scenarios:
+Your application typically receives unvalidated input data from external sources in following scenarios:
 * Reading command line arguments
 * Reading environment variables
 * Reading standard input
-* Reading files from file system
-* Reading data from socket (Network input)
-* End-user input from user interface 
+* Reading file(s) from file system
+* Reading data from socket (network input)
+* End-user input from user interface
 
 You can also create validated objects, for example:
 ```ts
@@ -128,7 +128,7 @@ type Person = {
   lastName: VString<1,64>;
   nickNames: VString<1,64>[];
   email: VString<'email'>;
-  password: VString<'strongPassword'>;
+  password: VString<'8,1024,strongPassword'>;
   age: VInt<0,255>;
   interestPercent: VFloat<'0,100'>;
 }
