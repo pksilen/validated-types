@@ -14,6 +14,11 @@
 ## Table of Contents
   - [Installation](#installation)
   - [Usage](#usage)
+    - [Introduction](#introduction)
+    - [Validated Integers](#validated-integers)
+    - [Validated Floats](#validated-floats)
+    - [Validated Strings](#validated-string)
+    - [Validated Objects](#validated-objects)
   - [API Documentation](#api-documentation)
     - [VFloat](#vfloat)
     - [VInt](#vint)
@@ -29,6 +34,23 @@ npm install --save validated-types
 
 ## <a name="usage"></a> Usage
 
+### <a name="introduction"></a> Introduction
+By using validated types for the parameters of your application's functions, you can rest assured that only proper values are ever passed to your function.
+You don't have to do any validation work inside your functions, just use the value of already validated parameter. The validation of the value is done only once upon the construction of validated objects,
+so there is no performance penalty in using the validated values as many times as you need.
+
+You should create the validated int/float/string objects (i.e. VInt/VFloat/VString objects) in functions that receive unvalidated input data and then pass the validated values to the rest of the functions in your application.
+
+Your application typically receives unvalidated input data from external sources in following scenarios:
+
+- Reading command line arguments
+- Reading environment variables
+- Reading standard input
+- Reading file(s) from file system
+- Reading data from socket (network input)
+- End-user input from user interface
+
+### <a name="validated-integers"></a> Validated Integers
 You can validate your integer, float and string type variables with `validated-types`.
 For example, to create a validated integer which allows values between 1 and 10, you declare:
 
@@ -62,6 +84,7 @@ Custom validator must be registered before it is used by any validated types `cr
 This means that you should register your custom validators as early as possible in your application code.
 If custom validator is not registered, and it is used, an exception will be thrown.
 
+### <a name="validated-floats"></a> Validated Floats
 To create a validated float which allows positive values only, you declare:
 
 ```ts
@@ -79,6 +102,7 @@ useFloat(float); // prints to console: 5.25
 useFloat(possibleFloat ?? VFloat.create('positive', 1)); // prints to console: 1
 ```
 
+### <a name="validated-strings"></a> Validated Strings
 To create a validated string which allows URLs with minimum length of one and maximum length of 1024 characters, you declare:
 
 ```ts
@@ -124,21 +148,7 @@ useUrl(url); // prints to console: https://server.domain.com:8080/index.html
 useUrl(possibleUrl ?? VString.create(urlVSpec, 'https://server.domain.com:8080/index.html')); // prints to console: https://server.domain.com:8080/index.html
 ```
 
-By using validated types for the parameters of your application's functions, you can rest assured that only proper values are ever passed to your function.
-You don't have to do any validation work inside your functions, just use the value of already validated parameter. The validation of the value is done only once upon the construction of validated objects,
-so there is no performance penalty in using the validated values as many times as you need.
-
-You should create the validated int/float/string objects (i.e. VInt/VFloat/VString objects) in functions that receive unvalidated input data and then pass the validated values to the rest of the functions in your application.
-
-Your application typically receives unvalidated input data from external sources in following scenarios:
-
-- Reading command line arguments
-- Reading environment variables
-- Reading standard input
-- Reading file(s) from file system
-- Reading data from socket (network input)
-- End-user input from user interface
-
+### <a name="validated-objects"></a> Validated Objects
 You can also create validated objects, for example:
 
 ```ts
