@@ -1,7 +1,6 @@
 import VBase from '../base/VBase';
 import ValidationError from '../error/ValidationError';
 import ValidationSpecError from '../error/ValidationSpecError';
-import { FloatValidationSpec } from '../float/VFloat';
 
 export type IntValidationSpec<ValidationSpec extends string> =
   ValidationSpec extends `${infer MinValue},${infer MaxValue},${infer DivisibleByValue}`

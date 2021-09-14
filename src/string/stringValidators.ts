@@ -40,8 +40,8 @@ export const stringValidators: {
   uuid: (value) => value.length <= 36 && validator.isUUID(value),
   postalCode: (value) => value.length <= 32 && validator.isPostalCode(value, 'any'),
   creditCardExpiration: (value) =>
-    value.length <= 7 && !!value.match(/^(0[1-9]|1[0-2])\/([0-9]{2}|[2-9][0-9]{3})$/),
-  cvc: (value) => value.length <= 4 && !!value.match(/^[0-9]{3,4}$/),
+    value.length <= 7 && !!value.match(/^(0[1-9]|1[0-2])\/(\d{2}|[2-9]\d{3})$/),
+  cvc: (value) => value.length <= 4 && !!value.match(/^\d{3,4}$/),
   mobileNumber: (value) => value.length <= 32 && validator.isMobilePhone(value, 'any'),
   alpha: (value) => validator.isAlpha(value),
   alphanumeric: (value) => validator.isAlphanumeric(value),

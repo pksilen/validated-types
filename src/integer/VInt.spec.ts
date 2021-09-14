@@ -1,7 +1,6 @@
 // noinspection MagicNumberJS
 
 import VInt from './VInt';
-import VFloat from '../float/VFloat';
 
 VInt.registerCustomValidator('is5', (value) => value === 5);
 

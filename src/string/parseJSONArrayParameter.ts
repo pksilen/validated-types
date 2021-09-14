@@ -15,7 +15,7 @@ export default function parseJSONArrayParameter(parameter: string | undefined): 
       );
     }
 
-    return parameters.map((parameter) => (typeof parameter === 'string' ? parameter : parameter.toString()));
+    return parameters.map((param) => (typeof param === 'string' ? param : param.toString()));
   } catch {
     throw new ValidationSpecError(
       'Validator parameter must a JSON array of strings, for example ["abc", "xyz"]'
