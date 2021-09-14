@@ -14,6 +14,7 @@
     - [VFloat](#vfloat)
     - [VInt](#vint)
     - [VString](#vstring)
+    - [SpecOf](#specof)
 
 ## <a name="installation"></a> Installation
 
@@ -37,8 +38,8 @@ function useInt(int: VInt<'1,10'>) {
 const int: VInt<'1,10'> = VInt.createOrThrow('1,10', 5);
 const possibleInt: VInt<'1,10'> | null = VInt.create('1,10', 12);
 
-useInt(int);
-useInt(possibleInt ?? VInt.create('1,10', 10));
+useInt(int); // prints to console: 5
+useInt(possibleInt ?? VInt.create('1,10', 10)); // prints to console: 10
 ```
 
 You can also register a custom validator:
@@ -69,8 +70,8 @@ function useFloat(float: VFloat<'positive'>) {
 const float: VFloat<'positive'> = VFloat.createOrThrow('positive', 5.25);
 const possibleFloat: VFloat<'positive'> | null = VFloat.create('positive', -5.25);
 
-useFloat(float);
-useFloat(possibleFloat ?? VFloat.create('positive', 1));
+useFloat(float); // prints to console: 5.25
+useFloat(possibleFloat ?? VFloat.create('positive', 1)); // prints to console: 1
 ```
 
 To create a validated string which allows URLs with minimum length of one and maximum length of 1024 characters, you declare:
@@ -86,8 +87,8 @@ function useUrl(url: VString<'1,1024,url'>) {
 const url: VString<'1,1024,url'> = VString.createOrThrow('1,1024,url', 'https://www.mydomain.com');
 const possibleUrl: VString<'1,1024,url'> | null = VString.create('1,1024,url', 'invalid URL');
 
-useUrl(url);
-useUrl(possibleUrl ?? VString.create('1,1024,url', 'https://google.com'));
+useUrl(url); // prints to console: https://www.mydomain.com
+useUrl(possibleUrl ?? VString.create('1,1024,url', 'https://google.com')); // prints to console: https://google.com
 ```
 
 You can combine up to 5 different string validators together. Multiple validators are given as a tuple which can have 2-5 elements. The first element of the tuple should validate the length of the string, if needed. Rest of the elements in tuple should not validate the length of string anymore.
@@ -114,8 +115,8 @@ function useUrl(url: Url) {
 const url: Url = VString.createOrThrow(urlSpec, 'https://server.domain.com:8080/index.html');
 const possibleUrl: Url | null = VString.create(urlSpec, 'invalid URL');
 
-useUrl(url);
-useUrl(possibleUrl ?? VString.create(urlSpec, 'https://server.domain.com:8080/index.html'));
+useUrl(url); // prints to console: https://server.domain.com:8080/index.html
+useUrl(possibleUrl ?? VString.create(urlSpec, 'https://server.domain.com:8080/index.html')); // prints to console: https://server.domain.com:8080/index.html
 ```
 
 By using validated types for the parameters of your application's functions, you can rest assured that only proper values are ever passed to your function.
@@ -262,6 +263,8 @@ Same as `VInt.createOrThrow`, but instead of throwing, it returns a tuple `[VInt
 Returns the valid integer value.
 
 ### <a name="vstring"></a> VString
+
+### <a name="specof"></a> SpecOf
 
 [license-badge]: https://img.shields.io/badge/license-MIT-green
 [license]: https://github.com/pksilen/validated-types/blob/master/LICENSE
