@@ -45,14 +45,8 @@ export type StringValidationSpec<ValidationSpec extends string | undefined> = Va
     : { errorMessage: `Invalid string validator name: ${KnownLengthStringValidatorName}` }
   : never;
 
-export default class VString<
-  ValidationSpec extends string,
-  ValidationSpec2 extends string | undefined = undefined,
-  ValidationSpec3 extends string | undefined = undefined,
-  ValidationSpec4 extends string | undefined = undefined,
-  ValidationSpec5 extends string | undefined = undefined
-> extends VBase {
-  private validatedValue: string = '';
+export default class VString<ValidationSpec extends string | string[]> extends VBase {
+  private readonly validatedValue: string;
 
   // this will throw if invalid value is given that don't match the validation spec
   static createOrThrow<VSpec extends string>(
@@ -62,219 +56,194 @@ export default class VString<
   ): VString<VSpec> | never;
 
   // this will throw if invalid value is given that don't match the validation spec
-  static createOrThrow<VSpec extends string, VSpec2 extends string>(
-    validationSpec: [StringValidationSpecWithLength<VSpec>, StringValidationSpec<VSpec2>],
+  static createOrThrow<VSpec extends [string, string]>(
+    validationSpec: [StringValidationSpecWithLength<VSpec[0]>, StringValidationSpec<VSpec[1]>],
     value: string,
     varName?: string
-  ): VString<VSpec, VSpec2> | never;
+  ): VString<VSpec> | never;
 
   // this will throw if invalid value is given that don't match the validation spec
-  static createOrThrow<VSpec extends string, VSpec2 extends string, VSpec3 extends string>(
+  static createOrThrow<VSpec extends [string, string, string]>(
     validationSpec: [
-      StringValidationSpecWithLength<VSpec>,
-      StringValidationSpec<VSpec2>,
-      StringValidationSpec<VSpec3>
+      StringValidationSpecWithLength<VSpec[0]>,
+      StringValidationSpec<VSpec[1]>,
+      StringValidationSpec<VSpec[2]>
     ],
     value: string,
     varName?: string
-  ): VString<VSpec, VSpec2, VSpec3> | never;
+  ): VString<VSpec> | never;
 
   // this will throw if invalid value is given that don't match the validation spec
-  static createOrThrow<
-    VSpec extends string,
-    VSpec2 extends string,
-    VSpec3 extends string,
-    VSpec4 extends string
-  >(
+  static createOrThrow<VSpec extends [string, string, string, string]>(
     validationSpec: [
-      StringValidationSpecWithLength<VSpec>,
-      StringValidationSpec<VSpec2>,
-      StringValidationSpec<VSpec3>,
-      StringValidationSpec<VSpec4>
+      StringValidationSpecWithLength<VSpec[0]>,
+      StringValidationSpec<VSpec[1]>,
+      StringValidationSpec<VSpec[2]>,
+      StringValidationSpec<VSpec[3]>
     ],
     value: string,
     varName?: string
-  ): VString<VSpec, VSpec2, VSpec3, VSpec4> | never;
+  ): VString<VSpec> | never;
 
   // this will throw if invalid value is given that don't match the validation spec
-  static createOrThrow<
-    VSpec extends string,
-    VSpec2 extends string,
-    VSpec3 extends string,
-    VSpec4 extends string,
-    VSpec5 extends string
-  >(
+  static createOrThrow<VSpec extends [string, string, string, string, string]>(
     validationSpec: [
-      StringValidationSpecWithLength<VSpec>,
-      StringValidationSpec<VSpec2>,
-      StringValidationSpec<VSpec3>,
-      StringValidationSpec<VSpec4>,
-      StringValidationSpec<VSpec5>
+      StringValidationSpecWithLength<VSpec[0]>,
+      StringValidationSpec<VSpec[1]>,
+      StringValidationSpec<VSpec[2]>,
+      StringValidationSpec<VSpec[3]>,
+      StringValidationSpec<VSpec[4]>
     ],
     value: string,
     varName?: string
-  ): VString<VSpec, VSpec2, VSpec3, VSpec4, VSpec5> | never;
+  ): VString<VSpec> | never;
 
   // this will throw if invalid value is given that don't match the validation spec
-  static createOrThrow<
-    VSpec extends string,
-    VSpec2 extends string | undefined = undefined,
-    VSpec3 extends string | undefined = undefined,
-    VSpec4 extends string | undefined = undefined,
-    VSpec5 extends string | undefined = undefined
-  >(
-    validationSpec:
-      | StringValidationSpecWithLength<VSpec>
-      | [StringValidationSpecWithLength<VSpec>, StringValidationSpec<VSpec2>]
-      | [StringValidationSpecWithLength<VSpec>, StringValidationSpec<VSpec2>, StringValidationSpec<VSpec3>]
-      | [
-          StringValidationSpecWithLength<VSpec>,
-          StringValidationSpec<VSpec2>,
-          StringValidationSpec<VSpec3>,
-          StringValidationSpec<VSpec4>
-        ]
-      | [
-          StringValidationSpecWithLength<VSpec>,
-          StringValidationSpec<VSpec2>,
-          StringValidationSpec<VSpec3>,
-          StringValidationSpec<VSpec4>,
-          StringValidationSpec<VSpec5>
-        ],
+  static createOrThrow<VSpec extends string | string[]>(
+    validationSpec: VSpec extends string
+      ? StringValidationSpecWithLength<VSpec>
+      :
+          | [
+              StringValidationSpecWithLength<VSpec[0]>,
+              StringValidationSpec<VSpec[1]>,
+              StringValidationSpec<VSpec[2]>,
+              StringValidationSpec<VSpec[3]>,
+              StringValidationSpec<VSpec[4]>
+            ]
+          | [
+              StringValidationSpecWithLength<VSpec[0]>,
+              StringValidationSpec<VSpec[1]>,
+              StringValidationSpec<VSpec[2]>,
+              StringValidationSpec<VSpec[3]>
+            ]
+          | [
+              StringValidationSpecWithLength<VSpec[0]>,
+              StringValidationSpec<VSpec[1]>,
+              StringValidationSpec<VSpec[2]>
+            ]
+          | [StringValidationSpecWithLength<VSpec[0]>, StringValidationSpec<VSpec[1]>],
+
     value: string,
     varName?: string
-  ): VString<VSpec, VSpec2 | undefined, VSpec3 | undefined, VSpec4 | undefined> | never {
-    if (typeof validationSpec === 'object' && Array.isArray(validationSpec)) {
-      return new VString<
-        VSpec,
-        VSpec2 | undefined,
-        VSpec3 | undefined,
-        VSpec4 | undefined,
-        VSpec5 | undefined
-      >(validationSpec, value, varName);
-    } else {
-      return new VString<VSpec, VSpec2 | undefined>([validationSpec, undefined], value, varName);
-    }
+  ): VString<VSpec> | never {
+    return new VString<VSpec>(validationSpec, value, varName);
   }
 
   static create<VSpec extends string>(
     validationSpec: StringValidationSpecWithLength<VSpec>,
-    value: string
+    value: string,
+    varName?: string
   ): VString<VSpec> | null;
 
-  static create<VSpec extends string, VSpec2 extends string>(
-    validationSpec: [StringValidationSpecWithLength<VSpec>, StringValidationSpec<VSpec2>],
-    value: string
-  ): VString<VSpec, VSpec2> | null;
+  static create<VSpec extends [string, string]>(
+    validationSpec: [StringValidationSpecWithLength<VSpec[0]>, StringValidationSpec<VSpec[1]>],
+    value: string,
+    varName?: string
+  ): VString<VSpec> | null;
 
-  static create<VSpec extends string, VSpec2 extends string, VSpec3 extends string>(
+  static create<VSpec extends [string, string, string]>(
     validationSpec: [
-      StringValidationSpecWithLength<VSpec>,
-      StringValidationSpec<VSpec2>,
-      StringValidationSpec<VSpec3>
+      StringValidationSpecWithLength<VSpec[0]>,
+      StringValidationSpec<VSpec[1]>,
+      StringValidationSpec<VSpec[2]>
     ],
-    value: string
-  ): VString<VSpec, VSpec2, VSpec3> | null;
+    value: string,
+    varName?: string
+  ): VString<VSpec> | null;
 
-  static create<VSpec extends string, VSpec2 extends string, VSpec3 extends string, VSpec4 extends string>(
+  static create<VSpec extends [string, string, string, string]>(
     validationSpec: [
-      StringValidationSpecWithLength<VSpec>,
-      StringValidationSpec<VSpec2>,
-      StringValidationSpec<VSpec3>,
-      StringValidationSpec<VSpec4>
+      StringValidationSpecWithLength<VSpec[0]>,
+      StringValidationSpec<VSpec[1]>,
+      StringValidationSpec<VSpec[2]>,
+      StringValidationSpec<VSpec[3]>
     ],
-    value: string
-  ): VString<VSpec, VSpec2, VSpec3, VSpec4> | null;
+    value: string,
+    varName?: string
+  ): VString<VSpec> | null;
 
-  static create<
-    VSpec extends string,
-    VSpec2 extends string,
-    VSpec3 extends string,
-    VSpec4 extends string,
-    VSpec5 extends string
-  >(
+  static create<VSpec extends [string, string, string, string, string]>(
     validationSpec: [
-      StringValidationSpecWithLength<VSpec>,
-      StringValidationSpec<VSpec2>,
-      StringValidationSpec<VSpec3>,
-      StringValidationSpec<VSpec4>,
-      StringValidationSpec<VSpec5>
+      StringValidationSpecWithLength<VSpec[0]>,
+      StringValidationSpec<VSpec[1]>,
+      StringValidationSpec<VSpec[2]>,
+      StringValidationSpec<VSpec[3]>,
+      StringValidationSpec<VSpec[4]>
     ],
-    value: string
-  ): VString<VSpec, VSpec2, VSpec3, VSpec4, VSpec5> | null;
+    value: string,
+    varName?: string
+  ): VString<VSpec> | null;
 
-  static create<
-    VSpec extends string,
-    VSpec2 extends string | undefined = undefined,
-    VSpec3 extends string | undefined = undefined,
-    VSpec4 extends string | undefined = undefined,
-    VSpec5 extends string | undefined = undefined
-  >(
-    validationSpec:
-      | StringValidationSpecWithLength<VSpec>
-      | [StringValidationSpecWithLength<VSpec>, StringValidationSpec<VSpec2>]
-      | [StringValidationSpecWithLength<VSpec>, StringValidationSpec<VSpec2>, StringValidationSpec<VSpec3>]
-      | [
-          StringValidationSpecWithLength<VSpec>,
-          StringValidationSpec<VSpec2>,
-          StringValidationSpec<VSpec3>,
-          StringValidationSpec<VSpec4>
-        ]
-      | [
-          StringValidationSpecWithLength<VSpec>,
-          StringValidationSpec<VSpec2>,
-          StringValidationSpec<VSpec3>,
-          StringValidationSpec<VSpec4>,
-          StringValidationSpec<VSpec5>
-        ],
-    value: string
-  ): VString<VSpec, VSpec2 | undefined, VSpec3 | undefined, VSpec4 | undefined> | null {
+  static create<VSpec extends string | string[]>(
+    validationSpec: VSpec extends string
+      ? StringValidationSpecWithLength<VSpec>
+      :
+          | [
+              StringValidationSpecWithLength<VSpec[0]>,
+              StringValidationSpec<VSpec[1]>,
+              StringValidationSpec<VSpec[2]>,
+              StringValidationSpec<VSpec[3]>,
+              StringValidationSpec<VSpec[4]>
+            ]
+          | [
+              StringValidationSpecWithLength<VSpec[0]>,
+              StringValidationSpec<VSpec[1]>,
+              StringValidationSpec<VSpec[2]>,
+              StringValidationSpec<VSpec[3]>
+            ]
+          | [
+              StringValidationSpecWithLength<VSpec[0]>,
+              StringValidationSpec<VSpec[1]>,
+              StringValidationSpec<VSpec[2]>
+            ]
+          | [StringValidationSpecWithLength<VSpec[0]>, StringValidationSpec<VSpec[1]>],
+
+    value: string,
+    varName?: string
+  ): VString<VSpec> | null {
     try {
-      if (typeof validationSpec === 'object' && Array.isArray(validationSpec)) {
-        return new VString<
-          VSpec,
-          VSpec2 | undefined,
-          VSpec3 | undefined,
-          VSpec4 | undefined,
-          VSpec5 | undefined
-        >(validationSpec, value);
-      } else {
-        return new VString<VSpec, VSpec2 | undefined>([validationSpec, undefined], value);
-      }
+      return new VString<VSpec>(validationSpec, value, varName);
     } catch {
       return null;
     }
   }
 
   protected constructor(
-    validationSpecs:
-      | [StringValidationSpecWithLength<ValidationSpec>, StringValidationSpec<ValidationSpec2>]
-      | [
-          StringValidationSpecWithLength<ValidationSpec>,
-          StringValidationSpec<ValidationSpec2>,
-          StringValidationSpec<ValidationSpec3>
-        ]
-      | [
-          StringValidationSpecWithLength<ValidationSpec>,
-          StringValidationSpec<ValidationSpec2>,
-          StringValidationSpec<ValidationSpec3>,
-          StringValidationSpec<ValidationSpec4>
-        ]
-      | [
-          StringValidationSpecWithLength<ValidationSpec>,
-          StringValidationSpec<ValidationSpec2>,
-          StringValidationSpec<ValidationSpec3>,
-          StringValidationSpec<ValidationSpec4>,
-          StringValidationSpec<ValidationSpec5>
-        ],
+    validationSpec: ValidationSpec extends string
+      ? StringValidationSpecWithLength<ValidationSpec>
+      :
+          | [
+              StringValidationSpecWithLength<ValidationSpec[0]>,
+              StringValidationSpec<ValidationSpec[1]>,
+              StringValidationSpec<ValidationSpec[2]>,
+              StringValidationSpec<ValidationSpec[3]>,
+              StringValidationSpec<ValidationSpec[4]>
+            ]
+          | [
+              StringValidationSpecWithLength<ValidationSpec[0]>,
+              StringValidationSpec<ValidationSpec[1]>,
+              StringValidationSpec<ValidationSpec[2]>,
+              StringValidationSpec<ValidationSpec[3]>
+            ]
+          | [
+              StringValidationSpecWithLength<ValidationSpec[0]>,
+              StringValidationSpec<ValidationSpec[1]>,
+              StringValidationSpec<ValidationSpec[2]>
+            ]
+          | [StringValidationSpecWithLength<ValidationSpec[0]>, StringValidationSpec<ValidationSpec[1]>],
     value: string,
     varName?: string
   ) {
     super();
-    const [validationSpecWithLength, ...otherValidationSpecs] = validationSpecs;
-    this.validateValueWithValidationSpec(validationSpecWithLength, value, varName, true);
-    otherValidationSpecs.forEach((validationSpec) => {
-      this.validateValueWithValidationSpec(validationSpec, value, varName, false);
-    });
+    if (Array.isArray(validationSpec)) {
+      VString.validateValueWithValidationSpec(validationSpec[0], value, varName, true);
+      validationSpec.slice(1).forEach((vSpec) => {
+        VString.validateValueWithValidationSpec(vSpec, value, varName, false);
+      });
+    } else {
+      VString.validateValueWithValidationSpec(validationSpec, value, varName, true);
+    }
+
     this.validatedValue = value;
   }
 
@@ -282,10 +251,8 @@ export default class VString<
     return this.validatedValue;
   }
 
-  private validateValueWithValidationSpec(
-    validationSpec:
-      | StringValidationSpecWithLength<ValidationSpec>
-      | StringValidationSpec<ValidationSpec2 | ValidationSpec3 | ValidationSpec4 | ValidationSpec5>,
+  private static validateValueWithValidationSpec(
+    validationSpec: string,
     value: string,
     varName: string | undefined,
     shouldValidateLength: boolean
@@ -295,12 +262,11 @@ export default class VString<
     }
 
     if (shouldValidateLength) {
-      VString.validateLength(validationSpec as string, value, varName);
+      VString.validateLength(validationSpec, value, varName);
     }
 
-    VBase.validateByCustomValidator(validationSpec as string, value, varName);
-    VString.validateByValidator(validationSpec as string, value, shouldValidateLength, varName);
-    this.validatedValue = value;
+    VBase.validateByCustomValidator(validationSpec, value, varName);
+    VString.validateByValidator(validationSpec, value, shouldValidateLength, varName);
   }
 
   private static validateLength(validationSpec: string, value: string, varName?: string): void | never {

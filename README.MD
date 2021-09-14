@@ -19,6 +19,8 @@ You can validate your integer, float and string type variables with `validated-t
 For example, to create a validated integer which allows values between 1 and 10, you declare:
 
 ```ts
+import { VInt } from 'validated-types';
+
 function useInt(int: VInt<'1,10'>) {
   // use int here
   console.log(int.value);
@@ -33,6 +35,7 @@ useInt(possibleInt ?? VInt.create('1,10', 10));
 
 You can also register a custom validator:
 ```ts
+import { VInt } from 'validated-types';
 
 VInt.registerCustomValidator('isEven', (value) => value % 2 === 0 )
 
@@ -40,9 +43,15 @@ const evenNumber : VInt<'custom:isEven'> = VInt.createOrThrow('custom:isEven', 2
 const possibleEvenNumber: VInt<'custom:isEven'> | null = VInt.create('custom:isEven', 1);
 ```
 
+Custom validator must be registered before it is used by any validated types `create` or `createOrThrow` method.
+This means that you should register your custom validators as early as possible in your application code.
+If custom validator is not registered, and it is used, an exception will be thrown.
+
 To create a validated float which allows positive values only, you declare:
 
 ```ts
+import { VFloat } from 'validated-types';
+
 function useFloat(float: VFloat<'positive'>) {
   // use float here
   console.log(float.value);
@@ -58,21 +67,45 @@ useFloat(possibleFloat ?? VFloat.create('positive', 1));
 To create a validated string which allows URLs with minimum length of one and maximum length of 1024 characters, you declare:
 
 ```ts
-function useString(string: VString<'1,1024,url'>) {
-  // use string here
-  console.log(string.value);
+import { VString } from 'validated-types';
+
+function useUrl(url: VString<'1,1024,url'>) {
+  // use URL here
+  console.log(url.value);
 }
 
 const string: VString<'1,1024,url'> = VString.createOrThrow('1,1024,url', 'https://www.mydomain.com');
-const possibleString: VFloat<'1,1024,url'> | null = VFloat.create('1,1024,url', 'invalid URL');
+const possibleString: VString<'1,1024,url'> | null = VString.create('1,1024,url', 'invalid URL');
 
-useString(string);
-useString(possibleString ?? VString.create('1,1024,url', 'https://google.com'));
+useUrl(url);
+useUrl(possibleUrl ?? VString.create('1,1024,url', 'https://google.com'));
 ```
 
-By using validated types in your application's functions' parameters, you can rest assured that only proper values are ever passed to your function.
+You can combine up to 5 different string validators together, for example:
+```ts
+import { SpecOf, VInt } from 'validated-types';
 
-You should create the validated int/float/string objects (VInt/VFloat/VString) in functions that receive unvalidated input data and then pass those validated values to the other functions in your application.
+type Url = ['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'] 
+const urlSpec: SpecOf<Url> = ['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'];
+
+function useUrl(url: Url) {
+  // use URL here
+  console.log(url.value);
+}
+
+const url: Url = VString.createOrThrow(urlSpec, 'https://server.domain.com:8080/index.html');
+const possibleString: Url | null = VString.create(urlSpec, 'invalid URL');
+
+useUrl(url);
+useUrl(possibleUrl ?? VString.create(urlSpec, 'https://server.domain.com:8080/index.html'));
+```
+
+
+By using validated types for the parameters of  your application's functions', you can rest assured that only proper values are ever passed to your function.
+You don't have to do any validation work inside your functions, just use the value of already validated parameter. The validation of the value is done only once upon the construction of validated objects,
+so there is no performance penalty in using the validated values as many times as you need.
+
+You should create the validated int/float/string objects (VInt/VFloat/VString) in functions that receive unvalidated input data and then pass the validated values to the rest of the functions in your application.
 
 Your application typically receives unvalidated input data in following scenarios:
 * Reading command line arguments
@@ -80,16 +113,38 @@ Your application typically receives unvalidated input data in following scenario
 * Reading standard input
 * Reading files from file system
 * Reading data from socket (Network input)
+* End-user input from user interface 
 
 You can also create validated objects, for example:
 ```ts
-type VPerson = {
+type Person = {
   firstName: VString<1,64>;
   lastName: VString<1,64>;
+  nickNames: VString<1,64>[];
   email: VString<'email'>;
   password: VString<'strongPassword'>;
   age: VInt<0,255>;
   interestPercent: VFloat<'0,100'>;
+}
+```
+
+```ts
+// Defined in types.ts
+type Name = VString<1,64>;
+type Email = VString<'email'>;
+type Password = VString<'8,1024,strongPassword'>
+type Age = VInt<0,255>;
+type Percent = VFloat<'0,100'>;
+
+// Defined in Person.ts
+type Person = {
+  firstName: Name;
+  lastName: Name;
+  nickNames: Name[];
+  email: Email;
+  password: Password;
+  age: Age;
+  interestPercent: Percent;
 }
 ```
 

@@ -23,7 +23,7 @@ describe('VString', () => {
       expect(string.value).toEqual(' abc');
     });
     it('should create a VString object successfully when value matches multiple validation specs', () => {
-      const string: VString<'0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'> =
+      const string: VString<['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html']> =
         VString.createOrThrow(
           ['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'],
           'https://apiserver.domain.com:8080/index.html'
@@ -34,7 +34,7 @@ describe('VString', () => {
     it('should throw ValidationError when value has multiple validation specs and value does not match one of them', () => {
       expect(() => {
         // noinspection HttpUrlsUsage
-        VString.createOrThrow<'0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'>(
+        VString.createOrThrow<['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html']>(
           ['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'],
           'http://apiserver.domain.com:8080/index.html'
         );
@@ -141,7 +141,7 @@ describe('VString', () => {
       expect(possibleString?.value).toEqual('abc');
     });
     it('should create a VString object successfully when value matches multiple validation specs', () => {
-      const possibleString: VString<'0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'> | null =
+      const possibleString: VString<['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html']> | null =
         VString.create(
           ['0,255,lowercase', 'url', 'startsWith,https', 'endsWith,.html'],
           'https://apiserver.domain.com:8080/index.html'
