@@ -433,5 +433,5 @@ If you want to request a new feature, for example, a new type of validator for s
 [version-badge]: https://img.shields.io/npm/v/validated-types.svg?style=flat-square
 [package]: https://www.npmjs.com/package/validated-types
 [downloads]: https://img.shields.io/npm/dm/validated-types
-[build]: https://img.shields.io/circleci/project/github/pksilen/validated-types/master.svg?style=flat-square
-[circleci]: https://circleci.com/gh/pksilen/validated-types/tree/master
+[build]: https://img.shields.io/circleci/project/github/pksilen/validated-types/main.svg?style=flat-square
+[circleci]: https://circleci.com/gh/pksilen/validated-types/tree/main
