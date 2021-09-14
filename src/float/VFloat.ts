@@ -35,6 +35,18 @@ export default class VFloat<ValidationSpec extends string> extends VBase {
     }
   }
 
+  static createOrError<VSpec extends string>(
+    validationSpec: FloatValidationSpec<VSpec>,
+    value: number,
+    varName?: string
+  ): [VFloat<VSpec> | null, Error | null] {
+    try {
+      return [new VFloat<VSpec>(validationSpec, value, varName), null];
+    } catch (error) {
+      return [null, error as Error];
+    }
+  }
+
   protected constructor(
     validationSpec: FloatValidationSpec<ValidationSpec>,
     value: number,

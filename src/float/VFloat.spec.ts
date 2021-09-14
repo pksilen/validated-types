@@ -111,4 +111,16 @@ describe('VFloat', () => {
       expect(possibleFloat).toEqual(null);
     });
   });
+  describe('createOrError', () => {
+    it('should create a VFloat object successfully when value matches validation spec', () => {
+      const [float, error]: [VFloat<'0.5,10.5'> | null, Error | null] = VFloat.createOrError('0.5,10.5', 5.1);
+      expect(float?.value).toEqual(5.1);
+      expect(error).toBeNull();
+    });
+    it('should return error when value does not match validation spec', () => {
+      const [float, error]: [VFloat<'0.5,10.5'> | null, Error | null] = VFloat.createOrError('0.5,10.5', 0.3);
+      expect(float).toBeNull();
+      expect(error).toBeInstanceOf(Error);
+    });
+  });
 });

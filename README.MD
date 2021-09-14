@@ -186,6 +186,7 @@ class VFloat {
   static registerCustomValidator(validatorName: string, validateFunc: (value: number) => boolean): void;
   static createOrThrow(validationSpec: string, value: number, varName?: string): VFloat | never;
   static create(validationSpec: string, value: number, varName?: string): VFloat | null;
+  static createOrError(validationSpec: string, value: number, varName?: string): [VFloat<VSpec> | null, Error | null];
   value(): number;
 }
 ```
@@ -211,6 +212,9 @@ If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 
 #### VFloat.create()
 Same as `VFloat.createOrThrow`, but instead of throwing, it returns `null`
+
+#### VFloat.createOrError()
+Same as `VFloat.createOrThrow`, but instead of throwing, it returns a tuple either `[VFloat, null]` or `[null, Error]`
 
 #### value()
 Returns the valid float value.
