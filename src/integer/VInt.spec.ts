@@ -1,6 +1,7 @@
 // noinspection MagicNumberJS
 
 import VInt from './VInt';
+import VFloat from '../float/VFloat';
 
 VInt.registerCustomValidator('is5', (value) => value === 5);
 
@@ -82,6 +83,18 @@ describe('VInt', () => {
     it('should return null when value does not match validation spec', () => {
       const possibleInt: VInt<'0,10'> | null = VInt.create('0,10', 11);
       expect(possibleInt).toEqual(null);
+    });
+  });
+  describe('createOrError', () => {
+    it('should create a VInt object successfully when value matches validation spec', () => {
+      const [int, error]: [VInt<'5,10'> | null, Error | null] = VInt.createOrError('5,10', 5);
+      expect(int?.value).toEqual(5);
+      expect(error).toBeNull();
+    });
+    it('should return error when value does not match validation spec', () => {
+      const [int, error]: [VInt<'0,10'> | null, Error | null] = VInt.createOrError('0,10', -1);
+      expect(int).toBeNull();
+      expect(error).toBeInstanceOf(Error);
     });
   });
 });

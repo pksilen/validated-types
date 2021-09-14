@@ -1,6 +1,7 @@
 import VBase from '../base/VBase';
 import ValidationError from '../error/ValidationError';
 import ValidationSpecError from '../error/ValidationSpecError';
+import { FloatValidationSpec } from '../float/VFloat';
 
 export type IntValidationSpec<ValidationSpec extends string> =
   ValidationSpec extends `${infer MinValue},${infer MaxValue},${infer DivisibleByValue}`
@@ -35,6 +36,18 @@ export default class VInt<ValidationSpec extends string> extends VBase {
       return new VInt<VSpec>(validationSpec, value);
     } catch {
       return null;
+    }
+  }
+
+  static createOrError<VSpec extends string>(
+    validationSpec: IntValidationSpec<VSpec>,
+    value: number,
+    varName?: string
+  ): [VInt<VSpec>, null] | [null, Error] {
+    try {
+      return [new VInt<VSpec>(validationSpec, value, varName), null];
+    } catch (error) {
+      return [null, error as Error];
     }
   }
 

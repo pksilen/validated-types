@@ -214,7 +214,48 @@ If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 Same as `VFloat.createOrThrow`, but instead of throwing, it returns `null`
 
 #### VFloat.createOrError()
-Same as `VFloat.createOrThrow`, but instead of throwing, it returns a tuple  `[VFloat, null]` on success and tuple `[null, Error]` on validation failure
+Same as `VFloat.createOrThrow`, but instead of throwing, it returns a tuple `[VFloat, null]` on success and tuple `[null, Error]` on validation failure
 
 #### value()
 Returns the valid float value.
+
+### VInt
+
+```ts
+class VInt {
+  static registerCustomValidator(validatorName: string, validateFunc: (value: number) => boolean): void;
+  static createOrThrow(validationSpec: string, value: number, varName?: string): VInt | never;
+  static create(validationSpec: string, value: number, varName?: string): VInt | null;
+  static createOrError(validationSpec: string, value: number, varName?: string): [VInt<VSpec>, null] | [null, Error];
+  value(): number;
+}
+```
+
+#### VInt.registerCustomValidator()
+Registers a custom validator with given name. `validateFunc` receives a float value as parameter and returns boolean based on success of validation.
+
+#### VFloat.createOrThrow()
+Creates a new validated integer value object or throws a `ValidationError` exception if supplied value is invalid.
+`validationSpec` is a string of following form `'[<minValue>],[<maxValue>][,<divisibleByValue>] | negative | positive | custom:<custom_validator_name>'`.
+
+`validationSpec` examples:
+* '0,100'
+* '0,100,2'
+* '100,'
+* ',0'
+* 'positive'
+* 'negative'
+* 'custom:isEven'
+
+If `minValue` is missing, `Number.MIN_SAFE_INTEGER` is used.
+If `maxValue` is missing, `Number.MAX_SAFE_INTEGER` is used.
+If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
+
+#### VInt.create()
+Same as `VInt.createOrThrow`, but instead of throwing, it returns `null`
+
+#### VInt.createOrError()
+Same as `VInt.createOrThrow`, but instead of throwing, it returns a tuple `[VInt, null]` on success and tuple `[null, Error]` on validation failure
+
+#### value()
+Returns the valid integer value.
