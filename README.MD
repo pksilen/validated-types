@@ -86,9 +86,8 @@ You can combine up to 5 different string validators together. Below example vali
 * is at most 1024 characters long
 * is lower case string
 * is valid URL
-* URL starts with 'https'
-* URL ends with '.html
-* '
+* URL starts with *https*
+* URL ends with *.html*
 ```ts
 import { SpecOf, VInt } from 'validated-types';
 
