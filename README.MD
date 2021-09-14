@@ -4,6 +4,7 @@
 
 [![version][version-badge]][package]
 [![build][build]][circleci]
+[![coverage][coverage]][codecov]
 [![Downloads][downloads]][package]
 [![MIT License][license-badge]][license]
 
@@ -435,3 +436,5 @@ If you want to request a new feature, for example, a new type of validator for s
 [downloads]: https://img.shields.io/npm/dm/validated-types
 [build]: https://img.shields.io/circleci/project/github/pksilen/validated-types/main.svg?style=flat-square
 [circleci]: https://circleci.com/gh/pksilen/validated-types/tree/main
+[coverage]: https://img.shields.io/codecov/c/github/pksilen/validated-types/main.svg?style=flat-square
+[codecov]: https://codecov.io/gh/pksilen/validated-types
