@@ -350,7 +350,8 @@ Possible values for `<known_length_validator_name>`:
  * cvc               
  * mobileNumber
 
-More information about validators can be found [validator.js documentation](https://github.com/validatorjs/validator.js/)
+More information about validators can be found in [validator.js documentation](https://github.com/validatorjs/validator.js/)
+If you need a new built-in validator, please [open a new issue](https://github.com/pksilen/validated-types/issues) about that.
 
 `validationSpec` examples:
 * '0,100'
@@ -373,6 +374,24 @@ Same as `VString.createOrThrow`, but instead of throwing, it returns a tuple `[V
 Returns the valid string value.
 
 ### <a name="vspecof"></a> VSpecOf
+
+Extracts the validation spec type of validated type.
+
+For example:
+```ts
+type Month = VInt<'1,12'>);
+const monthSpec: VSpecOf<Month> = '1,12';
+const month: Month = VInt.createOrThrow(monthSpec, 1);
+
+type Percent = VFloat<'0,100'>;
+const percentSpec: VSpecOf<Percent> = '0,100';
+const percent: Percent = VFloat.createOrThrow(percentSpec, 25.0);
+
+type Url = VString<['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html']>;
+const urlSpec: VSpecOf<Url> = ['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html'];
+const url: Url = VString.createOrThrow(urlSpec, 'https://server.domain.com:8080/index.html');
+```
+
 
 [license-badge]: https://img.shields.io/badge/license-MIT-green
 [license]: https://github.com/pksilen/validated-types/blob/master/LICENSE
