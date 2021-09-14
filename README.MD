@@ -7,13 +7,21 @@
 [![Downloads][downloads]][package]
 [![MIT License][license-badge]][license]
 
-## Installation
+## Table of Contents
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [API Documentation](#api-documentation)
+    - [VFloat](#vfloat)
+    - [VInt](#vint)
+    - [VString](#vstring)
+
+## <a name="installation"></a> Installation
 
 ```bash
 npm install --save validated-types
 ```
 
-## Usage
+## <a name="usage"></a> Usage
 
 You can validate your integer, float and string type variables with `validated-types`.
 For example, to create a validated integer which allows values between 1 and 10, you declare:
@@ -169,17 +177,9 @@ type Person = {
 };
 ```
 
-[license-badge]: https://img.shields.io/badge/license-MIT-green
-[license]: https://github.com/pksilen/validated-types/blob/master/LICENSE
-[version-badge]: https://img.shields.io/npm/v/validated-types.svg?style=flat-square
-[package]: https://www.npmjs.com/package/validated-types
-[downloads]: https://img.shields.io/npm/dm/validated-types
-[build]: https://img.shields.io/circleci/project/github/pksilen/validated-types/master.svg?style=flat-square
-[circleci]: https://circleci.com/gh/pksilen/validated-types/tree/master
+## <a name="api-documentation"></a> API documentation
 
-## API documentation
-
-### VFloat
+### <a name="vfloat"></a> VFloat
 
 ```ts
 class VFloat {
@@ -219,7 +219,7 @@ Same as `VFloat.createOrThrow`, but instead of throwing, it returns a tuple `[VF
 #### value()
 Returns the valid float value.
 
-### VInt
+### <a name="vint"></a> VInt
 
 ```ts
 class VInt {
@@ -234,7 +234,7 @@ class VInt {
 #### VInt.registerCustomValidator()
 Registers a custom validator with given name. `validateFunc` receives a float value as parameter and returns boolean based on success of validation.
 
-#### VFloat.createOrThrow()
+#### VInt.createOrThrow()
 Creates a new validated integer value object or throws a `ValidationError` exception if supplied value is invalid.
 `validationSpec` is a string of following form `'[<minValue>],[<maxValue>][,<divisibleByValue>] | negative | positive | custom:<custom_validator_name>'`.
 
@@ -243,6 +243,7 @@ Creates a new validated integer value object or throws a `ValidationError` excep
 * '0,100,2'
 * '100,'
 * ',0'
+* ','
 * 'positive'
 * 'negative'
 * 'custom:isEven'
@@ -259,3 +260,13 @@ Same as `VInt.createOrThrow`, but instead of throwing, it returns a tuple `[VInt
 
 #### value()
 Returns the valid integer value.
+
+### <a name="vstring"></a> VString
+
+[license-badge]: https://img.shields.io/badge/license-MIT-green
+[license]: https://github.com/pksilen/validated-types/blob/master/LICENSE
+[version-badge]: https://img.shields.io/npm/v/validated-types.svg?style=flat-square
+[package]: https://www.npmjs.com/package/validated-types
+[downloads]: https://img.shields.io/npm/dm/validated-types
+[build]: https://img.shields.io/circleci/project/github/pksilen/validated-types/master.svg?style=flat-square
+[circleci]: https://circleci.com/gh/pksilen/validated-types/tree/master
