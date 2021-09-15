@@ -24,9 +24,29 @@
   - [Validate Objects](#validated-objects)
 - [API Documentation](#api-documentation)
   - [VFloat](#vfloat)
+    - [registerCustomValidator](#vfloat-registerCustomValidator)
+    - [createOrThrow](#vfloat-createOrThrow)
+    - [create](#vfloat-create)
+    - [createOrError](#vfloat-createOrError)
+    - [value](#vfloat-value)
   - [VInt](#vint)
+    - [registerCustomValidator](#vint-registerCustomValidator)
+    - [createOrThrow](#vint-createOrThrow)
+    - [create](#vint-create)
+    - [createOrError](#vint-createOrError)
+    - [value](#vint-value)
   - [VString](#vstring)
+    - [registerCustomValidator](#vstring-registerCustomValidator)
+    - [createOrThrow](#vstring-createOrThrow)
+    - [create](#vstring-create)
+    - [createOrError](#vstring-createOrError)
+    - [value](#vstring-value)
   - [VArray](#varray)
+    - [registerCustomValidator](#varray-registerCustomValidator)
+    - [createOrThrow](#varray-createOrThrow)
+    - [create](#varray-create)
+    - [createOrError](#varray-createOrError)
+    - [value](#varray-value)
   - [VSpecOf](#vspecof)
 - [Feedback](#feedback)
 - [License](#license)
@@ -187,16 +207,18 @@ You can also create an array of validated objects, for example below example val
 ```ts
 import { VArray } from 'validated-types';
 
-function useArray(array: VArray<'1,10,unique', VString<'email'>>) {
-  // use array here
-  console.log(array.forEach(elem => elem.value));
+type EmailAddresses =  VArray<'1,10,unique', VString<'email'>>;
+const emailAddressesVSpec: VSpecOf<EmailAddresses> = '1,10,unique';
+
+function sendEmails(emailAddresses: EmailAddresses, subject: string, body: string) {
+  console.log(emailAddresses.forEach(emailAddress=> emailAddress.value));
 }
 
-const email: VString<'email'> = VString.createOrThrow('email', 'test@example.com');
-const email2: VString<'email'> = VString.createOrThrow('email', 'test2@example.com');
-const array: VArray<'1,10,unique', VString<'email'>> = VArray.createOrThrow('1,10,unique', [email, email2]);
+const emailAddress: VString<'email'> = VString.createOrThrow('email', 'test@example.com');
+const emailAddress2: VString<'email'> = VString.createOrThrow('email', 'test2@example.com');
+const emailAddresses: EmailAddresses = VArray.createOrThrow(emailAddressesVSpec, [emailAddress, emailAddress2]);
 
-useArray(array); // prints to console: 'test@example.com' and 'test2@example.com'
+sendEmails(emailAddresses, 'subj', 'body'); // prints to console: 'test@example.com' and 'test2@example.com'
 ```
 
 ### <a name="validated-objects"></a> Validate Objects
@@ -250,27 +272,27 @@ type Person = {
 ### <a name="vfloat"></a> VFloat
 
 ```ts
-class VFloat {
+class VFloat<VSpec extends string> {
   static registerCustomValidator(validatorName: string, validateFunc: (value: number) => boolean): void;
-  static createOrThrow(validationSpec: string, value: number, varName?: string): VFloat | never;
-  static create(validationSpec: string, value: number, varName?: string): VFloat | null;
+  static createOrThrow(validationSpec: string, value: number, varName?: string): VFloat<VSpec> | never;
+  static create(validationSpec: string, value: number, varName?: string): VFloat<VSpec> | null;
   static createOrError(
     validationSpec: string,
     value: number,
     varName?: string
-  ): [VFloat, null] | [null, Error];
+  ): [VFloat<VSpec>, null] | [null, Error];
   get value(): number;
 }
 ```
 
-#### VFloat.registerCustomValidator
+#### <a name="vfloat-registerCustomValidator"></a> VFloat.registerCustomValidator
 `static registerCustomValidator(validatorName: string, validateFunc: (value: number) => boolean): void`
 
 Registers a custom validator with given name. `validateFunc` receives a float value as parameter and returns boolean based on success of validation.
 You must register your custom validator before using it in any of the `create` functions.
 
-#### VFloat.createOrThrow
-`static createOrThrow(validationSpec: string, value: number, varName?: string): VFloat | never`
+#### <a name="vfloat-createOrThrow"></a>VFloat.createOrThrow
+`static createOrThrow(validationSpec: string, value: number, varName?: string): VFloat<VSpec> | never`
 
 Creates a new validated float value object or throws a `ValidationError` exception if supplied value is invalid.
 `validationSpec` is a string of following form `'[<minValue>],[<maxValue>] | negative | positive | custom:<custom_validator_name>'`.
@@ -288,14 +310,14 @@ If `minValue` is missing, `Number.MIN_VALUE` is used.
 If `maxValue` is missing, `Number.MAX_VALUE` is used.
 If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 
-#### VFloat.create
-`static create(validationSpec: string, value: number, varName?: string): VFloat | null`
+#### <a name="vfloat-create"></a>VFloat.create
+`static create(validationSpec: string, value: number, varName?: string): VFloat<VSpec> | null`
 
 Same as `VFloat.createOrThrow`, but instead of throwing on validation failure, it returns `null`.
 This method is useful if you don't care about the error message, but just want to know if validation succeeded or not.
 
-#### VFloat.createOrError
-`static createOrError(validationSpec: string, value: number, varName?: string): [VFloat, null] | [null, Error]`
+#### <a name="vfloat-createOrError"></a>VFloat.createOrError
+`static createOrError(validationSpec: string, value: number, varName?: string): [VFloat<VSpec>, null] | [null, Error]`
 
 Same as `VFloat.createOrThrow`, but instead of throwing on validation failure, it returns a tuple `[VFloat, null]` on success and tuple `[null, Error]` on validation failure.
 This method is useful for Go language style of programming where you get a 2-tuple return value where the last element in tuple contains the possible error.
@@ -308,7 +330,7 @@ if (err) {
 }
 ```
 
-#### value
+#### <a name="vfloat-value"></a>value
 `get value(): number`
 
 Returns the valid float value.
@@ -316,10 +338,10 @@ Returns the valid float value.
 ### <a name="vint"></a> VInt
 
 ```ts
-class VInt {
+class VInt<VSpec extends string> {
   static registerCustomValidator(validatorName: string, validateFunc: (value: number) => boolean): void;
-  static createOrThrow(validationSpec: string, value: number, varName?: string): VInt | never;
-  static create(validationSpec: string, value: number, varName?: string): VInt | null;
+  static createOrThrow(validationSpec: string, value: number, varName?: string): VInt<VSpec> | never;
+  static create(validationSpec: string, value: number, varName?: string): VInt<VSpec> | null;
   static createOrError(
     validationSpec: string,
     value: number,
@@ -329,12 +351,14 @@ class VInt {
 }
 ```
 
-#### VInt.registerCustomValidator()
+#### <a name="vint-registerCustomValidator"></a>VInt.registerCustomValidator
+`static registerCustomValidator(validatorName: string, validateFunc: (value: number) => boolean): void`
 
 Registers a custom validator with given name. `validateFunc` receives a number as parameter and returns boolean based on success of validation.
 You must register your custom validator before using it in any of the `create` functions.
 
-#### VInt.createOrThrow()
+#### <a name="vint-createOrThrow"></a>VInt.createOrThrow
+`static createOrThrow(validationSpec: string, value: number, varName?: string): VInt<VSpec> | never`
 
 Creates a new validated integer value object or throws a `ValidationError` exception if supplied value is invalid.
 `validationSpec` is a string of following form `'[<minValue>],[<maxValue>][,<divisibleByValue>] | negative | positive | custom:<custom_validator_name>'`.
@@ -354,12 +378,14 @@ If `minValue` is missing, `Number.MIN_SAFE_INTEGER` is used.
 If `maxValue` is missing, `Number.MAX_SAFE_INTEGER` is used.
 If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 
-#### VInt.create()
+#### <a name="vint-create"></a>VInt.create
+`static create(validationSpec: string, value: number, varName?: string): VInt<VSpec> | null`
 
 Same as `VInt.createOrThrow`, but instead of throwing on validation failure, it returns `null`.
 This method is useful if you don't care about the error message, but just want to know if validation succeeded or not.
 
-#### VInt.createOrError()
+#### <a name="vint-createOrError"></a> VInt.createOrError
+`static createOrError(validationSpec: string, value: number, varName?: string): [VInt<VSpec>, null] | [null, Error]`
 
 Same as `VInt.createOrThrow`, but instead of throwing on validation failure, it returns a tuple `[VInt, null]` on success and tuple `[null, Error]` on validation failure
 This method is useful for Go language style of programming where you get a 2-tuple return value where the last element in tuple contains the possible error.
@@ -372,17 +398,18 @@ if (err) {
 }
 ```
 
-#### value
+#### <a name="vint-value"></a> value
+`get value(): number`
 
 Returns the valid integer value.
 
 ### <a name="vstring"></a> VString
 
 ```ts
-class VString {
+class VString<VSpec extends string> {
   static registerCustomValidator(validatorName: string, validateFunc: (value: string) => boolean): void;
-  static createOrThrow(validationSpec: string, value: number, varName?: string): VString | never;
-  static create(validationSpec: string, value: number, varName?: string): VString | null;
+  static createOrThrow(validationSpec: string, value: number, varName?: string): VString<VSpec> | never;
+  static create(validationSpec: string, value: number, varName?: string): VString<VSpec> | null;
   static createOrError(
     validationSpec: string,
     value: number,
@@ -392,12 +419,14 @@ class VString {
 }
 ```
 
-#### VString.registerCustomValidator()
+#### <a name="vstring-registerCustomValidator"></a>VString.registerCustomValidator
+`static registerCustomValidator(validatorName: string, validateFunc: (value: string) => boolean): void`
 
 Registers a custom validator with given name. `validateFunc` receives a string value as parameter and returns boolean based on success of validation.
 You must register your custom validator before using it in any of the `create` functions.
 
-#### VString.createOrThrow()
+#### <a name="vstring-createOrThrow"></a>VString.createOrThrow
+`static createOrThrow(validationSpec: string, value: number, varName?: string): VString<VSpec> | never`
 
 Creates a new validated integer value object or throws a `ValidationError` exception if supplied value is invalid.
 `validationSpec` is a string of following form `'[<minLength>],<maxLength>[,<unknown_length_validator_name>[,<parameter>]] | <known_length_validator_name> | custom:<custom_validator_name>'`.
@@ -488,12 +517,14 @@ If you need a new built-in validator, please [open a new issue](https://github.c
 If `minLength` is missing, 0 is used.
 If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 
-#### VString.create()
+#### <a name="vstring-create"></a>VString.create
+`static create(validationSpec: string, value: number, varName?: string): VString<VSpec> | null`
 
 Same as `VString.createOrThrow`, but instead of throwing on validation failure, it returns `null`.
 This method is useful if you don't care about the error message, but just want to know if validation succeeded or not.
 
-#### VString.createOrError()
+#### <a name="vstring-createOrErrorr"></a>VString.createOrError
+`static createOrError(validationSpec: string, value: number, varName?: string): [VString<VSpec>, null] | [null, Error]`
 
 Same as `VString.createOrThrow`, but instead of throwing on validation failure, it returns a tuple `[VString, null]` on success and tuple `[null, Error]` on validation failure
 This method is useful for Go language style of programming where you get a 2-tuple return value where the last element in tuple contains the possible error.
@@ -506,34 +537,37 @@ if (err) {
 }
 ```
 
-#### value
+#### <a name="vstring-value"></a>value
+`get value(): string`
 
 Returns the valid string value.
 
 ### <a name="varray"></a> VArray
+ 
+`T` is the type of elements in the array.
 
 ```ts
 class VArray<VSpec extends string, T> {
   static registerCustomValidator(validatorName: string, validateFunc: (value: T[]) => boolean): void;
-  static createOrThrow(validationSpec: string, value: T[], varName?: string): VArray | never;
-  static create(validationSpec: string, value: T[], varName?: string): VArray | null;
+  static createOrThrow(validationSpec: string, value: T[], varName?: string): VArray<VSpec, T> | never;
+  static create(validationSpec: string, value: T[], varName?: string): VArray<VSpec, T> | null;
   static createOrError(
     validationSpec: string,
     value: T[],
     varName?: string
-  ): [VArray<VSpec>, null] | [null, Error];
+  ): [VArray<VSpec, T>, null] | [null, Error];
   get value(): T[];
 }
 ```
 
-`T` is the type of elements in the array.
-
-#### VArray.registerCustomValidator()
+#### <a name="varray-registerCustomValidator"></a> VArray.registerCustomValidator
+`static registerCustomValidator(validatorName: string, validateFunc: (value: T[]) => boolean): void`
 
 Registers a custom validator with given name. `validateFunc` receives an array as parameter and returns boolean based on success of validation.
 You must register your custom validator before using it in any of the `create` functions.
 
-#### VArray.createOrThrow()
+#### <a name="varray-createOrThrow"></a>VArray.createOrThrow
+`static createOrThrow(validationSpec: string, value: T[], varName?: string): VArray<VSpec, T> | never`
 
 Creates a new validated array value object or throws a `ValidationError` exception if supplied value is invalid.
 `validationSpec` is a string of following form `'[<minLength>],<maxLength>[,unique] | custom:<custom_validator_name>'`.
@@ -548,25 +582,28 @@ Creates a new validated array value object or throws a `ValidationError` excepti
 If `minLength` is missing, 0 is used.
 If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 
-#### VArray.create()
+#### <a name="varray-create"></a>VArray.create
+`static create(validationSpec: string, value: T[], varName?: string): VArray<VSpec, T> | null`
 
 Same as `VFloat.createOrThrow`, but instead of throwing on validation failure, it returns `null`.
 This method is useful if you don't care about the error message, but just want to know if validation succeeded or not.
 
-#### VArray.createOrError()
+#### <a name="varray-createOrError"></a>VArray.createOrError
+`static createOrError(validationSpec: string, value: T[], varName?: string): [VArray<VSpec, T>, null] | [null, Error]`
 
 Same as `VFloat.createOrThrow`, but instead of throwing on validation failure, it returns a tuple `[VArray, null]` on success and tuple `[null, Error]` on validation failure.
 This method is useful for Go language style of programming where you get a 2-tuple return value where the last element in tuple contains the possible error.
 For example:
 
 ```ts
-const [array err] = VArray.createOrError<'1,10', number>('1,10', [1]);
+const [array, err] = VArray.createOrError<'1,10', number>('1,10', [1]);
 if (err) {
   // handle error here
 }
 ```
 
-#### value
+#### <a name="varray-value"></a>value
+`get value(): T[]`
 
 Returns the validated array.
 
