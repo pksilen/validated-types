@@ -13,6 +13,7 @@
 
 ## Table of Contents
 
+- [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage](#usage)
   - [Introduction](#introduction)
@@ -29,6 +30,10 @@
   - [VSpecOf](#vspecof)
 - [Feedback](#feedback)
 - [License](#license)
+
+## <a name="prerequisites"></a> Prerequisites
+* Node >= 12.19
+* Typescript >= 4.0.0
 
 ## <a name="installation"></a> Installation
 
