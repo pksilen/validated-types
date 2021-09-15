@@ -515,6 +515,8 @@ class VArray<VSpec extends string, T> {
 }
 ```
 
+`T` is the type of elements in the array.
+
 #### VArray.registerCustomValidator()
 
 Registers a custom validator with given name. `validateFunc` receives an array as parameter and returns boolean based on success of validation.
