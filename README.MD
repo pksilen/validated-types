@@ -28,6 +28,7 @@
   - [VArray](#varray)
   - [VSpecOf](#vspecof)
 - [Feedback](#feedback)
+- [License](#license)
 
 ## <a name="installation"></a> Installation
 
@@ -584,6 +585,10 @@ const url: Url = VString.createOrThrow(urlVSpec, 'https://server.domain.com:8080
 If you want to report a bug, please [create a new issue](https://github.com/pksilen/validated-types/issues) about that.
 
 If you want to request a new feature, for example, a new type of validator for string, please [create a new issue](https://github.com/pksilen/validated-types/issues) about that.
+
+## <a name="license"></a> License
+
+[MIT](https://github.com/pksilen/validated-types/blob/main/LICENSE)
 
 [license-badge]: https://img.shields.io/badge/license-MIT-green
 [license]: https://github.com/pksilen/validated-types/blob/master/LICENSE
