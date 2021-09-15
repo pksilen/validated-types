@@ -258,17 +258,19 @@ class VFloat {
     validationSpec: string,
     value: number,
     varName?: string
-  ): [VFloat<VSpec>, null] | [null, Error];
+  ): [VFloat, null] | [null, Error];
   get value(): number;
 }
 ```
 
-#### VFloat.registerCustomValidator()
+#### VFloat.registerCustomValidator
+`static registerCustomValidator(validatorName: string, validateFunc: (value: number) => boolean): void`
 
 Registers a custom validator with given name. `validateFunc` receives a float value as parameter and returns boolean based on success of validation.
 You must register your custom validator before using it in any of the `create` functions.
 
-#### VFloat.createOrThrow()
+#### VFloat.createOrThrow
+`static createOrThrow(validationSpec: string, value: number, varName?: string): VFloat | never`
 
 Creates a new validated float value object or throws a `ValidationError` exception if supplied value is invalid.
 `validationSpec` is a string of following form `'[<minValue>],[<maxValue>] | negative | positive | custom:<custom_validator_name>'`.
@@ -286,12 +288,14 @@ If `minValue` is missing, `Number.MIN_VALUE` is used.
 If `maxValue` is missing, `Number.MAX_VALUE` is used.
 If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 
-#### VFloat.create()
+#### VFloat.create
+`static create(validationSpec: string, value: number, varName?: string): VFloat | null`
 
 Same as `VFloat.createOrThrow`, but instead of throwing on validation failure, it returns `null`.
 This method is useful if you don't care about the error message, but just want to know if validation succeeded or not.
 
-#### VFloat.createOrError()
+#### VFloat.createOrError
+`static createOrError(validationSpec: string, value: number, varName?: string): [VFloat, null] | [null, Error]`
 
 Same as `VFloat.createOrThrow`, but instead of throwing on validation failure, it returns a tuple `[VFloat, null]` on success and tuple `[null, Error]` on validation failure.
 This method is useful for Go language style of programming where you get a 2-tuple return value where the last element in tuple contains the possible error.
@@ -305,6 +309,7 @@ if (err) {
 ```
 
 #### value
+`get value(): number`
 
 Returns the valid float value.
 
