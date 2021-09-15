@@ -15,7 +15,7 @@ export type IntValidationSpec<ValidationSpec extends string> =
       : { errorMessage: `Invalid int validator name: ${IntValidatorName}` }
     : never;
 
-export default class VInt<ValidationSpec extends string> extends VBase {
+export default class VInt<ValidationSpec extends string> extends VBase<number> {
   private readonly validatedValue: number;
 
   // this will throw if invalid value is given that don't match the validation spec

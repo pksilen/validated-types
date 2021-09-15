@@ -11,7 +11,7 @@ export type FloatValidationSpec<ValidationSpec extends string> =
       : { errorMessage: `Invalid float validator name: ${FloatValidatorName}` }
     : never;
 
-export default class VFloat<ValidationSpec extends string> extends VBase {
+export default class VFloat<ValidationSpec extends string> extends VBase<number> {
   private readonly validatedValue: number;
 
   // this will throw if invalid value is given that don't match the validation spec

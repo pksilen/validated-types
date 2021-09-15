@@ -81,7 +81,7 @@ describe('VInt', () => {
     });
     it('should return null when value does not match validation spec', () => {
       const possibleInt: VInt<'0,10'> | null = VInt.create('0,10', 11);
-      expect(possibleInt).toEqual(null);
+      expect(possibleInt).toBeNull();
     });
   });
   describe('createOrError', () => {

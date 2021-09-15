@@ -151,7 +151,7 @@ describe('VString', () => {
     });
     it('should return null when value does not match validation spec', () => {
       const possibleString: VString<'0,5'> | null = VString.create('0,5', 'abc1234');
-      expect(possibleString).toEqual(null);
+      expect(possibleString).toBeNull();
     });
   });
   describe('createOrError', () => {

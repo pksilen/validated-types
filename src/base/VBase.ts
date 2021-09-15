@@ -1,16 +1,17 @@
 import ValidationSpecError from '../error/ValidationSpecError';
 import ValidationError from '../error/ValidationError';
 
-type CustomValidator = (value: number | string) => boolean;
+type CustomValidator<T> = (value: T) => boolean;
 
-type CustomValidators = {
-  [validatorName: string]: CustomValidator;
+type CustomValidators<T> = {
+  [validatorName: string]: CustomValidator<T>;
 };
 
-export default class VBase {
-  private static readonly customValidators: CustomValidators = {};
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default abstract class VBase<T> {
+  private static readonly customValidators: CustomValidators<any> = {};
 
-  static registerCustomValidator(validatorName: string, validateFunc: CustomValidator): void | never {
+  static registerCustomValidator<T>(validatorName: string, validateFunc: CustomValidator<T>): void | never {
     if (this.customValidators[validatorName]) {
       throw new Error(`Validator '${validatorName}' already exists`);
     }
@@ -18,13 +19,13 @@ export default class VBase {
     this.customValidators[validatorName] = validateFunc;
   }
 
-  static getCustomValidator(validatorName: string): CustomValidator {
+  static getCustomValidator(validatorName: string): CustomValidator<any> {
     return VBase.customValidators[validatorName];
   }
 
-  protected static validateByCustomValidator(
+  protected static validateByCustomValidator<T>(
     validationSpec: string,
-    value: string | number,
+    value: string | number | T[],
     varName?: string
   ): void | never {
     if (validationSpec.startsWith('custom:')) {
@@ -103,4 +104,46 @@ export default class VBase {
       );
     }
   }
+
+  protected static validateLength<T>(
+    validationSpec: string,
+    value: string | T[],
+    varName?: string
+  ): void | never {
+    if (validationSpec.includes(',')) {
+      const [minLengthStr, maxLengthStr] = validationSpec.split(',');
+      let minLength = parseInt(minLengthStr, 10);
+      const maxLength = parseInt(maxLengthStr, 10);
+
+      if (minLengthStr === '') {
+        minLength = 0;
+      }
+
+      if (isNaN(minLength)) {
+        throw new ValidationSpecError('Invalid minLength specified in validation spec');
+      }
+
+      if (isNaN(maxLength)) {
+        throw new ValidationSpecError('Invalid maxLength specified in validation spec');
+      }
+
+      if (value.length < minLength) {
+        throw new ValidationError(
+          varName
+            ? `Value in '${varName}' is shorter than required minimum length: ${minLength}`
+            : `Value is shorter than required minimum length: ${minLength}`
+        );
+      }
+
+      if (value.length > maxLength) {
+        throw new ValidationError(
+          varName
+            ? `Value in '${varName}' is longer than allowed maximum length: ${maxLength}`
+            : `Value is longer than allowed maximum length: ${maxLength}`
+        );
+      }
+    }
+  }
+
+  abstract get value(): T;
 }

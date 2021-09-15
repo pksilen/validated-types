@@ -108,7 +108,7 @@ describe('VFloat', () => {
     });
     it('should return null when value does not match validation spec', () => {
       const possibleFloat: VFloat<'0.5,10.5'> | null = VFloat.create('0.5,10.5', 0.3);
-      expect(possibleFloat).toEqual(null);
+      expect(possibleFloat).toBeNull();
     });
   });
   describe('createOrError', () => {

@@ -12,19 +12,22 @@
 [![MIT License][license-badge]][license]
 
 ## Table of Contents
-  - [Installation](#installation)
-  - [Usage](#usage)
-    - [Introduction](#introduction)
-    - [Validated Integers](#validated-integers)
-    - [Validated Floats](#validated-floats)
-    - [Validated Strings](#validated-string)
-    - [Validated Objects](#validated-objects)
-  - [API Documentation](#api-documentation)
-    - [VFloat](#vfloat)
-    - [VInt](#vint)
-    - [VString](#vstring)
-    - [VSpecOf](#vspecof)
-  - [Feedback](#feedback)
+
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Introduction](#introduction)
+  - [Validate Integers](#validated-integers)
+  - [Validate Floats](#validated-floats)
+  - [Validate Strings](#validated-string)
+  - [Validate Arrays](#validated-arrays)
+  - [Validate Objects](#validated-objects)
+- [API Documentation](#api-documentation)
+  - [VFloat](#vfloat)
+  - [VInt](#vint)
+  - [VString](#vstring)
+  - [VArray](#varray)
+  - [VSpecOf](#vspecof)
+- [Feedback](#feedback)
 
 ## <a name="installation"></a> Installation
 
@@ -35,6 +38,11 @@ npm install --save validated-types
 ## <a name="usage"></a> Usage
 
 ### <a name="introduction"></a> Introduction
+
+Validated-types is a type value validation library for Typescript. You can validate values of integers, floats, strings and arrays.
+For numbers, you can for example validate the minimum and maximum value. For strings, you can validate the length and also perform semantic validation
+to validate if a string should be, for example, a valid URL, IP address or email address.
+
 By using validated types for the parameters of your application's functions, you can rest assured that only proper values are ever passed to your function.
 You don't have to do any validation work inside your functions, just use the value of already validated parameter. The validation of the value is done only once upon the construction of validated objects,
 so there is no performance penalty in using the validated values as many times as you need.
@@ -50,7 +58,8 @@ Your application typically receives unvalidated input data from external sources
 - Reading data from socket (network input)
 - End-user input from user interface
 
-### <a name="validated-integers"></a> Validated Integers
+### <a name="validated-integers"></a> Validate Integers
+
 You can validate your integer, float and string type variables with `validated-types`.
 For example, to create a validated integer which allows values between 1 and 10, you declare:
 
@@ -84,7 +93,8 @@ Custom validator must be registered before it is used by any validated types `cr
 This means that you should register your custom validators as early as possible in your application code.
 If custom validator is not registered, and it is used, an exception will be thrown.
 
-### <a name="validated-floats"></a> Validated Floats
+### <a name="validated-floats"></a> Validate Floats
+
 To create a validated float which allows positive values only, you declare:
 
 ```ts
@@ -102,7 +112,8 @@ useFloat(float); // prints to console: 5.25
 useFloat(possibleFloat ?? VFloat.create('positive', 1)); // prints to console: 1
 ```
 
-### <a name="validated-strings"></a> Validated Strings
+### <a name="validated-strings"></a> Validate Strings
+
 To create a validated string which allows URLs with minimum length of one and maximum length of 1024 characters, you declare:
 
 ```ts
@@ -148,7 +159,42 @@ useUrl(url); // prints to console: https://server.domain.com:8080/index.html
 useUrl(possibleUrl ?? VString.create(urlVSpec, 'https://server.domain.com:8080/index.html')); // prints to console: https://server.domain.com:8080/index.html
 ```
 
-### <a name="validated-objects"></a> Validated Objects
+### <a name="validated-arrays"></a> Validate Arrays
+To create a validated array of numbers which allows array length to be from 0 to 10 and requires all array elements to be unique, you declare:
+
+```ts
+import { VArray } from 'validated-types';
+
+function useArray(array: VArray<'0,10,unique', number>) {
+  // use array here
+  console.log(array.value);
+}
+
+const array: VArray<'0,10,unique', number> = VArray.createOrThrow('0,10,unique', [1, 2, 3]);
+const possibleArray: VArray<'0,10,unique', number> | null = VArray.create('0,10,unique', [1, 2, 2]);
+
+useArray(array); // prints to console: [1, 2, 3]
+useArray(possibleArray ?? VArray.create('0,10,unique', [3, 4, 5])); // prints to console: [3, 4, 5]
+```
+
+You can also create an array of validated objects, for example below example validates an array of from 1 to max 10 unique email addresses:
+```ts
+import { VArray } from 'validated-types';
+
+function useArray(array: VArray<'1,10,unique', VString<'email'>>) {
+  // use array here
+  console.log(array.forEach(elem => elem.value));
+}
+
+const email: VString<'email'> = VString.createOrThrow('email', 'test@example.com');
+const email2: VString<'email'> = VString.createOrThrow('email', 'test2@example.com');
+const array: VArray<'1,10,unique', VString<'email'>> = VArray.createOrThrow('1,10,unique', [email, email2]);
+
+useArray(array); // prints to console: 'test@example.com' and 'test2@example.com'
+```
+
+### <a name="validated-objects"></a> Validate Objects
+
 You can also create validated objects, for example:
 
 ```ts
@@ -202,36 +248,45 @@ class VFloat {
   static registerCustomValidator(validatorName: string, validateFunc: (value: number) => boolean): void;
   static createOrThrow(validationSpec: string, value: number, varName?: string): VFloat | never;
   static create(validationSpec: string, value: number, varName?: string): VFloat | null;
-  static createOrError(validationSpec: string, value: number, varName?: string): [VFloat<VSpec>, null] | [null, Error];
-  value(): number;
+  static createOrError(
+    validationSpec: string,
+    value: number,
+    varName?: string
+  ): [VFloat<VSpec>, null] | [null, Error];
+  get value(): number;
 }
 ```
 
 #### VFloat.registerCustomValidator()
+
 Registers a custom validator with given name. `validateFunc` receives a float value as parameter and returns boolean based on success of validation.
 You must register your custom validator before using it in any of the `create` functions.
 
 #### VFloat.createOrThrow()
+
 Creates a new validated float value object or throws a `ValidationError` exception if supplied value is invalid.
 `validationSpec` is a string of following form `'[<minValue>],[<maxValue>] | negative | positive | custom:<custom_validator_name>'`.
 
 `validationSpec` examples:
- * '0,100'
- * '100,'
- * ',0'
- * 'positive'
- * 'negative'
- * 'custom:isUsShoeSize'
+
+- '0,100'
+- '100,'
+- ',0'
+- 'positive'
+- 'negative'
+- 'custom:isUsShoeSize'
 
 If `minValue` is missing, `Number.MIN_VALUE` is used.
 If `maxValue` is missing, `Number.MAX_VALUE` is used.
 If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 
 #### VFloat.create()
+
 Same as `VFloat.createOrThrow`, but instead of throwing on validation failure, it returns `null`.
 This method is useful if you don't care about the error message, but just want to know if validation succeeded or not.
 
 #### VFloat.createOrError()
+
 Same as `VFloat.createOrThrow`, but instead of throwing on validation failure, it returns a tuple `[VFloat, null]` on success and tuple `[null, Error]` on validation failure.
 This method is useful for Go language style of programming where you get a 2-tuple return value where the last element in tuple contains the possible error.
 For example:
@@ -243,7 +298,8 @@ if (err) {
 }
 ```
 
-#### value()
+#### value
+
 Returns the valid float value.
 
 ### <a name="vint"></a> VInt
@@ -253,38 +309,47 @@ class VInt {
   static registerCustomValidator(validatorName: string, validateFunc: (value: number) => boolean): void;
   static createOrThrow(validationSpec: string, value: number, varName?: string): VInt | never;
   static create(validationSpec: string, value: number, varName?: string): VInt | null;
-  static createOrError(validationSpec: string, value: number, varName?: string): [VInt<VSpec>, null] | [null, Error];
-  value(): number;
+  static createOrError(
+    validationSpec: string,
+    value: number,
+    varName?: string
+  ): [VInt<VSpec>, null] | [null, Error];
+  get value(): number;
 }
 ```
 
 #### VInt.registerCustomValidator()
+
 Registers a custom validator with given name. `validateFunc` receives a number as parameter and returns boolean based on success of validation.
 You must register your custom validator before using it in any of the `create` functions.
 
 #### VInt.createOrThrow()
+
 Creates a new validated integer value object or throws a `ValidationError` exception if supplied value is invalid.
 `validationSpec` is a string of following form `'[<minValue>],[<maxValue>][,<divisibleByValue>] | negative | positive | custom:<custom_validator_name>'`.
 
 `validationSpec` examples:
-* '0,100'
-* '0,100,2'
-* '100,'
-* ',0'
-* ','
-* 'positive'
-* 'negative'
-* 'custom:isEven'
+
+- '0,100'
+- '0,100,2'
+- '100,'
+- ',0'
+- ','
+- 'positive'
+- 'negative'
+- 'custom:isEven'
 
 If `minValue` is missing, `Number.MIN_SAFE_INTEGER` is used.
 If `maxValue` is missing, `Number.MAX_SAFE_INTEGER` is used.
 If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 
 #### VInt.create()
+
 Same as `VInt.createOrThrow`, but instead of throwing on validation failure, it returns `null`.
 This method is useful if you don't care about the error message, but just want to know if validation succeeded or not.
 
 #### VInt.createOrError()
+
 Same as `VInt.createOrThrow`, but instead of throwing on validation failure, it returns a tuple `[VInt, null]` on success and tuple `[null, Error]` on validation failure
 This method is useful for Go language style of programming where you get a 2-tuple return value where the last element in tuple contains the possible error.
 For example:
@@ -296,7 +361,8 @@ if (err) {
 }
 ```
 
-#### value()
+#### value
+
 Returns the valid integer value.
 
 ### <a name="vstring"></a> VString
@@ -306,107 +372,118 @@ class VString {
   static registerCustomValidator(validatorName: string, validateFunc: (value: string) => boolean): void;
   static createOrThrow(validationSpec: string, value: number, varName?: string): VString | never;
   static create(validationSpec: string, value: number, varName?: string): VString | null;
-  static createOrError(validationSpec: string, value: number, varName?: string): [VString<VSpec>, null] | [null, Error];
-  value(): string;
+  static createOrError(
+    validationSpec: string,
+    value: number,
+    varName?: string
+  ): [VString<VSpec>, null] | [null, Error];
+  get value(): string;
 }
 ```
 
 #### VString.registerCustomValidator()
+
 Registers a custom validator with given name. `validateFunc` receives a string value as parameter and returns boolean based on success of validation.
 You must register your custom validator before using it in any of the `create` functions.
 
 #### VString.createOrThrow()
+
 Creates a new validated integer value object or throws a `ValidationError` exception if supplied value is invalid.
 `validationSpec` is a string of following form `'[<minLength>],<maxLength>[,<unknown_length_validator_name>[,<parameter>]] | <known_length_validator_name> | custom:<custom_validator_name>'`.
 
 Possible value for `<unknown_length_validator_name>`:
- * alpha         
- * alphanumeric  
- * ascii         
- * base32        
- * base58        
- * base64        
- * dataUri       
- * decimal       
- * fqdn          
- * md4           
- * md5           
- * sha1          
- * sha256        
- * sha384        
- * sha512        
- * crc32         
- * crc32b        
- * hex           
- * ipv4Range    
- * ipv6Range     
- * json          
- * lowercase    
- * magnetUri    
- * mongoId
- * numeric       
- * octal         
- * uppercase  
- * strongPassword
- * url
- * includes (requires `parameter`)
- * match (requires a RegExp string `parameter`)
- * isOneOf (requires JSON string array `parameter`)
- * isNoneOf (requires JSON string array `parameter`)
- * startsWith (requires `parameter`)
- * endsWith (requires `parameter`)
+
+- alpha
+- alphanumeric
+- ascii
+- base32
+- base58
+- base64
+- dataUri
+- decimal
+- fqdn
+- md4
+- md5
+- sha1
+- sha256
+- sha384
+- sha512
+- crc32
+- crc32b
+- hex
+- ipv4Range
+- ipv6Range
+- json
+- lowercase
+- magnetUri
+- mongoId
+- numeric
+- octal
+- uppercase
+- strongPassword
+- url
+- includes (requires `parameter`)
+- match (requires a RegExp string `parameter`)
+- isOneOf (requires JSON string array `parameter`)
+- isNoneOf (requires JSON string array `parameter`)
+- startsWith (requires `parameter`)
+- endsWith (requires `parameter`)
 
 Possible values for `<known_length_validator_name>`:
- * boolean             
- * bic                 
- * btcAddress          
- * creditCard          
- * ean                 
- * email              
- * ethereumAddress     
- * hsl                 
- * hexColor           
- * isin                
- * iban               
- * ipv4                
- * ipv6                
- * iso31661Alpha2    
- * iso31661Alpha3     
- * iso8601           
- * isrc               
- * issn              
- * jwt               
- * latLong             
- * macAddress         
- * mimeType           
- * port              
- * rgbColor           
- * semVer              
- * uuid                
- * postalCode         
- * creditCardExpiration
- * cvc               
- * mobileNumber
+
+- boolean
+- bic
+- btcAddress
+- creditCard
+- ean
+- email
+- ethereumAddress
+- hsl
+- hexColor
+- isin
+- iban
+- ipv4
+- ipv6
+- iso31661Alpha2
+- iso31661Alpha3
+- iso8601
+- isrc
+- issn
+- jwt
+- latLong
+- macAddress
+- mimeType
+- port
+- rgbColor
+- semVer
+- uuid
+- postalCode
+- creditCardExpiration
+- cvc
+- mobileNumber
 
 More information about validators can be found in [validator.js documentation](https://github.com/validatorjs/validator.js/)
 If you need a new built-in validator, please [open a new issue](https://github.com/pksilen/validated-types/issues) about that.
 
 `validationSpec` examples:
-* '0,100'
-* ',100'
-* '1,1024,url'
-* '1,1024,startsWith,https'
-* 'email'
-* 'custom:isSupplierName'
+
+- '0,100'
+- ',100'
+- '1,1024,url'
+- '1,1024,startsWith,https'
+- 'email'
+- 'custom:isSupplierName'
 
 If `minLength` is missing, 0 is used.
 If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
 
 #### VString.create()
+
 Same as `VString.createOrThrow`, but instead of throwing on validation failure, it returns `null`.
 This method is useful if you don't care about the error message, but just want to know if validation succeeded or not.
 
 #### VString.createOrError()
+
 Same as `VString.createOrThrow`, but instead of throwing on validation failure, it returns a tuple `[VString, null]` on success and tuple `[null, Error]` on validation failure
 This method is useful for Go language style of programming where you get a 2-tuple return value where the last element in tuple contains the possible error.
 For example:
@@ -418,14 +495,74 @@ if (err) {
 }
 ```
 
-#### value()
+#### value
+
 Returns the valid string value.
+
+### <a name="varray"></a> VArray
+
+```ts
+class VArray<VSpec extends string, T> {
+  static registerCustomValidator(validatorName: string, validateFunc: (value: T[]) => boolean): void;
+  static createOrThrow(validationSpec: string, value: T[], varName?: string): VArray | never;
+  static create(validationSpec: string, value: T[], varName?: string): VArray | null;
+  static createOrError(
+    validationSpec: string,
+    value: T[],
+    varName?: string
+  ): [VArray<VSpec>, null] | [null, Error];
+  get value(): T[];
+}
+```
+
+#### VArray.registerCustomValidator()
+
+Registers a custom validator with given name. `validateFunc` receives an array as parameter and returns boolean based on success of validation.
+You must register your custom validator before using it in any of the `create` functions.
+
+#### VArray.createOrThrow()
+
+Creates a new validated array value object or throws a `ValidationError` exception if supplied value is invalid.
+`validationSpec` is a string of following form `'[<minLength>],<maxLength>[,unique] | custom:<custom_validator_name>'`.
+
+`validationSpec` examples:
+
+- '0,100'
+- ',100'
+- '1,10,unique'
+- 'custom:includesSomething'
+
+If `minLength` is missing, 0 is used.
+If `varName` is supplied, it is mentioned in possible `ValidationError` thrown.
+
+#### VArray.create()
+
+Same as `VFloat.createOrThrow`, but instead of throwing on validation failure, it returns `null`.
+This method is useful if you don't care about the error message, but just want to know if validation succeeded or not.
+
+#### VArray.createOrError()
+
+Same as `VFloat.createOrThrow`, but instead of throwing on validation failure, it returns a tuple `[VArray, null]` on success and tuple `[null, Error]` on validation failure.
+This method is useful for Go language style of programming where you get a 2-tuple return value where the last element in tuple contains the possible error.
+For example:
+
+```ts
+const [array err] = VArray.createOrError<'1,10', number>('1,10', [1]);
+if (err) {
+  // handle error here
+}
+```
+
+#### value
+
+Returns the validated array.
 
 ### <a name="vspecof"></a> VSpecOf
 
 Extracts the validation spec type of the validated type.
 
 For example:
+
 ```ts
 type Month = VInt<'1,12'>);
 const monthVSpec: VSpecOf<Month> = '1,12';
@@ -441,6 +578,7 @@ const url: Url = VString.createOrThrow(urlVSpec, 'https://server.domain.com:8080
 ```
 
 ## <a name="feedback"></a> Feedback
+
 If you want to report a bug, please [create a new issue](https://github.com/pksilen/validated-types/issues) about that.
 
 If you want to request a new feature, for example, a new type of validator for string, please [create a new issue](https://github.com/pksilen/validated-types/issues) about that.

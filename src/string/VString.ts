@@ -3,7 +3,6 @@ import { KnownLengthStringValidatorNames } from './KnownLengthStringValidatorNam
 import { ParameterizedStringValidatorNames } from './ParameterizedStringValidatorNames';
 import { stringValidators } from './stringValidators';
 import VBase from '../base/VBase';
-import ValidationSpecError from '../error/ValidationSpecError';
 import ValidationError from '../error/ValidationError';
 
 export type StringValidationSpecWithLength<ValidationSpec extends string | undefined> =
@@ -68,7 +67,7 @@ type StringValidationSpecs<VSpec extends string | string[]> =
   | ThreeStringValidationSpecs<VSpec>
   | TwoStringValidationSpecs<VSpec>;
 
-export default class VString<ValidationSpec extends string | string[]> extends VBase {
+export default class VString<ValidationSpec extends string | string[]> extends VBase<string> {
   private readonly validatedValue: string;
 
   // this will throw if invalid value is given that don't match the validation spec
@@ -237,47 +236,11 @@ export default class VString<ValidationSpec extends string | string[]> extends V
     shouldValidateLength: boolean
   ) {
     if (shouldValidateLength) {
-      VString.validateLength(validationSpec, value, varName);
+      VBase.validateLength(validationSpec, value, varName);
     }
 
     VBase.validateByCustomValidator(validationSpec, value, varName);
     VString.validateByValidator(validationSpec, value, shouldValidateLength, varName);
-  }
-
-  private static validateLength(validationSpec: string, value: string, varName?: string): void | never {
-    if (validationSpec.includes(',')) {
-      const [minLengthStr, maxLengthStr] = validationSpec.split(',');
-      let minLength = parseInt(minLengthStr, 10);
-      const maxLength = parseInt(maxLengthStr, 10);
-
-      if (minLengthStr === '') {
-        minLength = 0;
-      }
-
-      if (isNaN(minLength)) {
-        throw new ValidationSpecError('Invalid minLength specified in validation spec');
-      }
-
-      if (isNaN(maxLength)) {
-        throw new ValidationSpecError('Invalid maxLength specified in validation spec');
-      }
-
-      if (value.length < minLength) {
-        throw new ValidationError(
-          varName
-            ? `Value in '${varName}' is shorter than required minimum length: ${minLength}`
-            : `Value is shorter than required minimum length: ${minLength}`
-        );
-      }
-
-      if (value.length > maxLength) {
-        throw new ValidationError(
-          varName
-            ? `Value in '${varName}' is longer than allowed maximum length: ${maxLength}`
-            : `Value is longer than allowed maximum length: ${maxLength}`
-        );
-      }
-    }
   }
 
   private static validateByValidator(
