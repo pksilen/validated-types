@@ -280,7 +280,7 @@ type Person = {
 ### <a name="create-semantic-types"></a> Create Semantic Types/Variables
 
 Semantic types and variables let you differentiate between variables of same type. The differentiation is done
-by assigning a semantic name to the type. Following example declare two semantic variables of `boolean` type.
+by assigning a semantic name to the type. Following example declares two semantic variables of `boolean` type with two different semantic names.
 
 ```ts
 import { SemVar } from 'validated-types';
@@ -296,7 +296,7 @@ function myFunc(isRecursiveCall: IsRecursiveCall, isInternalCall: IsInternalCall
 // Only this will succeed
 myFunc(new SemVar('isRecursiveCall', true), new SemVar('isInternalCall', true));
 
-// These will fail in compile time
+// These will fail during compilation
 myFunc(new SemVar('isInternalCall', true), new SemVar('isRecursiveCall', true));
 myFunc(true, true);
 myFunc(new SemVar('isSomethingElse', true), new SemVar('isInternalCall', true));
