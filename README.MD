@@ -57,7 +57,7 @@ It also allows of creating semantic types and declare variables with semantic ty
 - [License](#license)
 
 ## <a name="prerequisites"></a> Prerequisites
-* Typescript >= 4.0.0
+* Typescript >= 4.1.0
 
 ## <a name="installation"></a> Installation
 
