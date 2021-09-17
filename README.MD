@@ -301,6 +301,7 @@ myFunc(new SemVar('isInternalCall', true), new SemVar('isRecursiveCall', true));
 myFunc(true, true);
 myFunc(new SemVar('isSomethingElse', true), new SemVar('isInternalCall', true));
 myFunc(new SemVar('isRecursiveCall', true), new SemVar('isSomethingElse', true));
+myFunc(new SemVar('isSomethingElse', true), new SemVar('isSomethingElse', true));
 ```
 
 ## <a name="api-documentation"></a> API documentation
