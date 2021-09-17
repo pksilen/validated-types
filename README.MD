@@ -279,7 +279,7 @@ type Person = {
 
 ### <a name="create-semantic-types"></a> Create Semantic Types/Variables
 
-Semantic types and variables let's you differentiate between variables of same type. The differentiation is done
+Semantic types and variables let you differentiate between variables of same type. The differentiation is done
 by assigning a semantic name to the type. Following example declare two semantic variables of `boolean` type.
 
 ```ts
