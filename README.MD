@@ -1,6 +1,7 @@
 # validated-types
 
-`validated-types` is a library for Typescript to validate integer, float, string and array values.
+`validated-types` is a library for Typescript to create types for validated integer, float, string and array values.
+It also allows of creating semantic types and declare variables with semantic types. 
 
 [![version][version-badge]][package]
 [![build][build]][circleci]
@@ -87,9 +88,11 @@ Your application typically receives unvalidated input data from external sources
 - Reading data from socket (network input)
 - End-user input from user interface
 
-You can also create semantically typed variables using `SemVar`. Using semantically typed variables, you
-can for example differentiate between two different `boolean` values. If a function accepts two boolean arguments, it is possible
-that the calling function gives those arguments in wrong order, but you never notice it, because it does not generate a compilation error.
+You can also create semantic types and semantically typed variables using `SemVar`. Using semantic types, you
+can differentiate between multiple types of the same basic type. For example, If a function accepts two boolean arguments, it is possible
+that the calling function gives those two arguments in wrong order, but you never notice it, because it does not generate a compilation error.
+Using semantic types, you can differentiate between those two boolean types by giving them two different semantic names. 
+Semantic name is just any string describing the purpose of type/variable.
 
 ### <a name="validated-integers"></a> Validate Integers
 
