@@ -22,6 +22,7 @@
   - [Validate Strings](#validated-string)
   - [Validate Arrays](#validated-arrays)
   - [Validate Objects](#validated-objects)
+  - [Create Semantic Types/Variables](#create-semantic-types)
 - [API Documentation](#api-documentation)
   - [VFloat](#vfloat)
     - [registerCustomValidator](#vfloat-registerCustomValidator)
@@ -47,12 +48,14 @@
     - [create](#varray-create)
     - [createOrError](#varray-createOrError)
     - [value](#varray-value)
+  - [SemVar](#semvar)
+    - [constructor](#semvar-constructor)
+    - [value](#semvar-value)
   - [VSpecOf](#vspecof)
 - [Feedback](#feedback)
 - [License](#license)
 
 ## <a name="prerequisites"></a> Prerequisites
-* Node >= 12.19
 * Typescript >= 4.0.0
 
 ## <a name="installation"></a> Installation
@@ -83,6 +86,10 @@ Your application typically receives unvalidated input data from external sources
 - Reading file(s) from file system
 - Reading data from socket (network input)
 - End-user input from user interface
+
+You can also create semantically typed variables using `SemVar`. Using semantically typed variables, you
+can for example differentiate between two different `boolean` values. If a function accepts two boolean arguments, it is possible
+that the calling function gives those arguments in wrong order, but you never notice it, because it does not generate a compilation error.
 
 ### <a name="validated-integers"></a> Validate Integers
 
@@ -265,6 +272,32 @@ type Person = {
   age: Age;
   interestPercent: Percent;
 };
+```
+
+### <a name="create-semantic-types"></a> Create Semantic Types/Variables
+
+Semantic types and variables let's you differentiate between variables of same type. The differentiation is done
+by assigning a semantic name to the type. Following example declare two semantic variables of `boolean` type.
+
+```ts
+import { SemVar } from 'validated-types';
+
+type IsRecursiveCall = SemVar<boolean, 'isRecursiveCall'>
+type IsInternalCall = SemVar<boolean, 'isInternalCall'>;
+
+function myFunc(isRecursiveCall: IsRecursiveCall, isInternalCall: IsInternalCall) {
+  console.log(isRecursiveCall.value);
+  console.log(isInternalCall.value);
+}
+
+// Only this will succeed
+myFunc(new SemVar('isRecursiveCall', true), new SemVar('isInternalCall', true));
+
+// These will fail in compile time
+myFunc(new SemVar('isInternalCall', true), new SemVar('isRecursiveCall', true));
+myFunc(true, true);
+myFunc(new SemVar('isSomethingElse', true), new SemVar('isInternalCall', true));
+myFunc(new SemVar('isRecursiveCall', true), new SemVar('isSomethingElse', true));
 ```
 
 ## <a name="api-documentation"></a> API documentation
@@ -606,6 +639,24 @@ if (err) {
 `get value(): T[]`
 
 Returns the validated array.
+
+### <a name="semvar"></a> SemVar
+`T` is the type of Semantic variable. 
+
+```ts
+class SemVar<T, N extends string> {
+  constructor(semanticName: string, value: T);
+  get value(): T;
+}
+```
+
+#### <a name="semvar-constructor"></a> constructor
+`constructor(semanticName: string, value: T)`
+Creates a new semantic variable with semantic name `semanticName` and with value of type `T`.
+
+#### <a name="semvar-value"></a> value
+`get value(): T`
+Get the value of semantic variable.
 
 ### <a name="vspecof"></a> VSpecOf
 
