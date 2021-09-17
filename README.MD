@@ -77,7 +77,7 @@ By using validated types for the parameters of your application's functions, you
 You don't have to do any validation work inside your functions, just use the value of already validated parameter. The validation of the value is done only once upon the construction of validated objects,
 so there is no performance penalty in using the validated values as many times as you need.
 
-You should create the validated int/float/string objects (i.e. VInt/VFloat/VString objects) in functions that receive unvalidated input data and then pass the validated values to the rest of the functions in your application.
+You should create the validated integer, float, string and array objects in functions that receive unvalidated input data and then pass the validated values to the rest of the functions in your application.
 
 Your application typically receives unvalidated input data from external sources in following scenarios:
 
