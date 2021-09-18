@@ -294,13 +294,13 @@ function myFunc(isRecursiveCall: IsRecursiveCall, isInternalCall: IsInternalCall
 }
 
 // Only this will succeed
-myFunc(new SemVar('isRecursiveCall', true), new SemVar('isInternalCall', true));
+myFunc(new SemVar('isRecursiveCall', false), new SemVar('isInternalCall', true));
 
 // These will fail during compilation
-myFunc(new SemVar('isInternalCall', true), new SemVar('isRecursiveCall', true));
+myFunc(new SemVar('isInternalCall', true), new SemVar('isRecursiveCall', false));
 myFunc(true, true);
 myFunc(new SemVar('isSomethingElse', true), new SemVar('isInternalCall', true));
-myFunc(new SemVar('isRecursiveCall', true), new SemVar('isSomethingElse', true));
+myFunc(new SemVar('isRecursiveCall', false), new SemVar('isSomethingElse', true));
 myFunc(new SemVar('isSomethingElse', true), new SemVar('isSomethingElse', true));
 ```
 
