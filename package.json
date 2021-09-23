@@ -1,6 +1,6 @@
 {
   "name": "validated-types",
-  "version": "1.6.5",
+  "version": "1.6.6",
   "description": "Validated integer, float, string and array types for Typescript",
   "author": {
     "name": "Petri Silen",
