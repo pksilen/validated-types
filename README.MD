@@ -325,8 +325,9 @@ function myFunc(firstName: FirstName, lastName: LastName) {
 const firstName: Name = VString.createOrThrow('1,64', 'John');
 const lastName: Name = VString.createOrThrow('1,64', 'Doe');
 
-const firstName2: Name = VString.createOrThrow('1,65', 'John');
-const lastName2: Name = VString.createOrThrow('1,65', 'Doe');
+type Name2 =  VString<'1,65'>
+const firstName2: Name2 = VString.createOrThrow('1,65', 'John');
+const lastName2: Name2 = VString.createOrThrow('1,65', 'Doe');
 
 // Only this will succeed where 'firstName' and 'lastName' are given in correct order with correct validated type
 myFunc(new SemVar({ firstName }), new SemVar({ lastName }));
