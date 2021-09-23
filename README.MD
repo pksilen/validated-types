@@ -325,7 +325,7 @@ function myFunc(firstName: FirstName, lastName: LastName) {
 const firstName: Name = VString.createOrThrow('1,64', 'John');
 const lastName: Name = VString.createOrThrow('1,64', 'Doe');
 
-type Name2 =  VString<'1,65'>
+type Name2 = VString<'1,65'>
 const firstName2: Name2 = VString.createOrThrow('1,65', 'John');
 const lastName2: Name2 = VString.createOrThrow('1,65', 'Doe');
 
@@ -682,8 +682,11 @@ Returns the validated array.
 `T` is the type of Semantic variable. 
 
 ```ts
+type SemName<N extends string> = N extends `${infer Name}` ? `${Name}` : never;
+
 class SemVar<T, N extends string> {
-  constructor(semanticName: string, value: T);
+  constructor(semanticName: SemName<N>, value: T);
+  constructor(semVar: { [K in SemName<N>]: T });
   get value(): T;
 }
 ```
