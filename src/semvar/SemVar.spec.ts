@@ -5,7 +5,7 @@ type IsInternalCall = SemVar<boolean, 'isInternalCall'>;
 describe('SemVar', () => {
   describe('constructor', () => {
     it('should create an SemVar object successfully', () => {
-      const isInternalCall: IsInternalCall = new SemVar('isInternalCall', true);
+      const isInternalCall: IsInternalCall = new SemVar({ isInternalCall: true });
       expect(isInternalCall).toBeInstanceOf(SemVar);
     });
   });

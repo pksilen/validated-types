@@ -293,17 +293,50 @@ function myFunc(isRecursiveCall: IsRecursiveCall, isInternalCall: IsInternalCall
   console.log(isInternalCall.value);
 }
 
+const isRecursiveCall = false;
+const isInternalCall = true;
+
 // Only this will succeed
-myFunc(new SemVar('isRecursiveCall', false), new SemVar('isInternalCall', true));
+myFunc(new SemVar({ isRecursiveCall }), new SemVar({ isInternalCall }));
 
 // These will fail during compilation
-myFunc(new SemVar('isInternalCall', true), new SemVar('isRecursiveCall', false));
+myFunc(new SemVar({ isInternalCall }), new SemVar({ isRecursiveCall }));
 myFunc(true, true);
 myFunc(new SemVar('isSomethingElse', true), new SemVar('isInternalCall', true));
 myFunc(new SemVar('isRecursiveCall', false), new SemVar('isSomethingElse', true));
 myFunc(new SemVar('isSomethingElse', true), new SemVar('isSomethingElse', true));
 ```
 
+You can use a validated type as a semantic type also. In the below example, a function takes two semantic parameters
+which both have the same base type `VString<'1,64'>`.
+
+```ts
+import { SemVar, VString } from 'validated-types';
+
+type Name = VString<'1,64'>;
+type FirstName = SemVar<Name, 'firstName'>;
+type LastName = SemVar<Name, 'lastName'>;
+
+function myFunc(firstName: FirstName, lastName: LastName) {
+  console.log(firstName.value);
+  console.log(lastName.value);
+}
+
+const firstName: Name = VString.createOrThrow('1,64', 'John');
+const lastName: Name = VString.createOrThrow('1,64', 'Doe');
+
+const firstName2: Name = VString.createOrThrow('1,65', 'John');
+const lastName2: Name = VString.createOrThrow('1,65', 'Doe');
+
+// Only this will succeed where 'firstName' and 'lastName' are given in correct order with correct validated type
+myFunc(new SemVar({ firstName }), new SemVar({ lastName }));
+
+// These below will fail during compilation
+myFunc(new SemVar({ lastName }), new SemVar({ firstName }));
+myFunc(new SemVar({ firstName: firstName2 }), new SemVar({ lastName: lastName2 }));
+myFunc('John', 'Doe');
+myFunc(firstName, lastName);
+```
 ## <a name="api-documentation"></a> API documentation
 
 ### <a name="vfloat"></a> VFloat
