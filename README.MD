@@ -692,7 +692,9 @@ class SemVar<T, N extends string> {
 ```
 
 #### <a name="semvar-constructor"></a> constructor
-`constructor(semanticName: string, value: T)`
+`constructor(semanticName: string, value: T)`  
+`constructor(semVar: { [K in SemName<N>]: T });`
+
 Creates a new semantic variable with semantic name `semanticName` and with value of type `T`.
 
 #### <a name="semvar-value"></a> value
