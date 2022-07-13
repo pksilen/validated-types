@@ -206,7 +206,7 @@ export default class VString<ValidationSpec extends string | string[]> extends V
   }
 
   protected constructor(
-    private readonly validationSpec: ValidationSpec extends string
+    protected readonly validationSpec: ValidationSpec extends string
       ? StringValidationSpecWithLength<ValidationSpec>
       : StringValidationSpecs<ValidationSpec>,
     value: string,

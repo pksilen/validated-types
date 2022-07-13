@@ -51,7 +51,7 @@ export default class VInt<VSpec extends string> extends VBase<number> {
   }
 
   protected constructor(
-    private readonly validationSpec: IntValidationSpec<VSpec>,
+    protected readonly validationSpec: IntValidationSpec<VSpec>,
     value: number,
     varName?: string
   ) {

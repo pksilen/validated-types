@@ -23,8 +23,6 @@ J
 src/string/VString.spec.ts,5/4/54763685a16c7e1af36df511ed4bc71edf627765
 C
 src/base/VSpecOf.ts,4/6/462c00f097c8637655ff8b4c3cf313d26e2b011e
-<
-src/index.ts,c/5/c5fb850250c7443c48a6c12b5cf6916773da31f1
 :
 
 .gitignore,a/5/a5cc2925ca8258af241be7e5b0381edf30266302

@@ -4,9 +4,12 @@ import VInt from './VInt';
 
 VInt.registerCustomValidator('is5', (value) => value === 5);
 
-function log(int: VInt<'0,1'>) {
+function log(int: VInt<'0,2'>) {
   console.log(int.value);
 }
+
+const int1: VInt<'0,10,'> = VInt.createOrThrow<'0,10,'>('0,10,', 5);
+// const int2: VInt<'0,10'> = int1;
 
 describe('VInt', () => {
   describe('createOrThrow', () => {

@@ -47,7 +47,7 @@ export default class VArray<ValidationSpec extends string, T> extends VBase<T[]>
   }
 
   protected constructor(
-    private readonly validationSpec: ArrayValidationSpec<ValidationSpec>,
+    protected readonly validationSpec: ArrayValidationSpec<ValidationSpec>,
     value: T[],
     varName?: string
   ) {
