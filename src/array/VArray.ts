@@ -46,7 +46,11 @@ export default class VArray<ValidationSpec extends string, T> extends VBase<T[]>
     }
   }
 
-  protected constructor(validationSpec: ArrayValidationSpec<ValidationSpec>, value: T[], varName?: string) {
+  protected constructor(
+    private readonly validationSpec: ArrayValidationSpec<ValidationSpec>,
+    value: T[],
+    varName?: string
+  ) {
     super();
     const validationSpecAsStr = validationSpec as string;
     VBase.validateByCustomValidator(validationSpecAsStr, value, varName);

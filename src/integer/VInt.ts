@@ -15,7 +15,7 @@ export type IntValidationSpec<ValidationSpec extends string> =
       : { errorMessage: `Invalid int validator name: ${IntValidatorName}` }
     : never;
 
-export default class VInt<ValidationSpec extends string> extends VBase<number> {
+export default class VInt<VSpec extends string> extends VBase<number> {
   private readonly validatedValue: number;
 
   // this will throw if invalid value is given that don't match the validation spec
@@ -24,7 +24,7 @@ export default class VInt<ValidationSpec extends string> extends VBase<number> {
     value: number,
     varName?: string
   ): VInt<VSpec> | never {
-    return new VInt<VSpec>(validationSpec, value, varName);
+    return new VInt(validationSpec, value, varName);
   }
 
   static create<VSpec extends string>(
@@ -32,7 +32,7 @@ export default class VInt<ValidationSpec extends string> extends VBase<number> {
     value: number
   ): VInt<VSpec> | null {
     try {
-      return new VInt<VSpec>(validationSpec, value);
+      return new VInt(validationSpec, value);
     } catch {
       return null;
     }
@@ -44,15 +44,19 @@ export default class VInt<ValidationSpec extends string> extends VBase<number> {
     varName?: string
   ): [VInt<VSpec>, null] | [null, Error] {
     try {
-      return [new VInt<VSpec>(validationSpec, value, varName), null];
+      return [new VInt(validationSpec, value, varName), null];
     } catch (error) {
       return [null, error as Error];
     }
   }
 
-  protected constructor(validationSpec: IntValidationSpec<ValidationSpec>, value: number, varName?: string) {
+  protected constructor(
+    private readonly validationSpec: IntValidationSpec<VSpec>,
+    value: number,
+    varName?: string
+  ) {
     super();
-    const validationSpecAsStr = validationSpec as string;
+    const validationSpecAsStr = this.validationSpec as unknown as string;
     VBase.validateByCustomValidator(validationSpecAsStr, value, varName);
     VBase.validateNumericRange(
       validationSpecAsStr,

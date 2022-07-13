@@ -4,11 +4,15 @@ import VInt from './VInt';
 
 VInt.registerCustomValidator('is5', (value) => value === 5);
 
+function log(int: VInt<'0,1'>) {
+  console.log(int.value);
+}
+
 describe('VInt', () => {
   describe('createOrThrow', () => {
     it('should create a VInt object successfully when value matches validation spec', () => {
       const int1: VInt<'0,10'> = VInt.createOrThrow('0,10', 5);
-      const int2: VInt<'0,10,'> = VInt.createOrThrow('0,10,', 5);
+      const int2: VInt<'0,10,'> = VInt.createOrThrow<'0,10,'>('0,10,', 5);
       expect(int1.value).toEqual(5);
       expect(int2.value).toEqual(5);
     });
@@ -86,12 +90,12 @@ describe('VInt', () => {
   });
   describe('createOrError', () => {
     it('should create a VInt object successfully when value matches validation spec', () => {
-      const [int, error]: [VInt<'5,10'> | null, Error | null] = VInt.createOrError('5,10', 5);
+      const [int, error] = VInt.createOrError<'5,10'>('5,10', 5);
       expect(int?.value).toEqual(5);
       expect(error).toBeNull();
     });
     it('should return error when value does not match validation spec', () => {
-      const [int, error]: [VInt<'0,10'> | null, Error | null] = VInt.createOrError('0,10', -1);
+      const [int, error] = VInt.createOrError<'0,10'>('0,10', -1);
       expect(int).toBeNull();
       expect(error).toBeInstanceOf(Error);
     });

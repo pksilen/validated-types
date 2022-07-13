@@ -48,7 +48,7 @@ export default class VFloat<ValidationSpec extends string> extends VBase<number>
   }
 
   protected constructor(
-    validationSpec: FloatValidationSpec<ValidationSpec>,
+    private readonly validationSpec: FloatValidationSpec<ValidationSpec>,
     value: number,
     varName?: string
   ) {
