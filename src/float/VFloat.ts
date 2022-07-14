@@ -23,6 +23,15 @@ export default class VFloat<ValidationSpec extends string> extends VBase<number>
     return new VFloat<VSpec>(validationSpec, value, varName);
   }
 
+  // this will throw if invalid value is given that don't match the validation spec
+  static tryCreate<VSpec extends string>(
+    validationSpec: FloatValidationSpec<VSpec>,
+    value: number,
+    varName?: string
+  ): VFloat<VSpec> | never {
+    return new VFloat<VSpec>(validationSpec, value, varName);
+  }
+
   static create<VSpec extends string>(
     validationSpec: FloatValidationSpec<VSpec>,
     value: number,

@@ -1,6 +1,12 @@
 import SemVar from './SemVar';
 
+function func(val: SemVar<boolean, 'isInternalCall'>) {
+  // NOOP
+}
+
 type IsInternalCall = SemVar<boolean, 'isInternalCall'>;
+const test = new SemVar<boolean, 'isInternalCall'>({ isInternalCall: true });
+func(test);
 
 describe('SemVar', () => {
   describe('constructor', () => {

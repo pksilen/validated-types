@@ -22,6 +22,15 @@ export default class VArray<ValidationSpec extends string, T> extends VBase<T[]>
     return new VArray<VSpec, T>(validationSpec, value, varName);
   }
 
+  // this will throw if invalid value is given that don't match the validation spec
+  static tryCeate<VSpec extends string, T>(
+    validationSpec: ArrayValidationSpec<VSpec>,
+    value: T[],
+    varName?: string
+  ): VArray<VSpec, T> | never {
+    return new VArray<VSpec, T>(validationSpec, value, varName);
+  }
+
   static create<VSpec extends string, T>(
     validationSpec: ArrayValidationSpec<VSpec>,
     value: T[],

@@ -20,7 +20,7 @@ It also allows of creating semantic types and declare variables with semantic ty
   - [Introduction](#introduction)
   - [Validate Integers](#validated-integers)
   - [Validate Floats](#validated-floats)
-  - [Validate Strings](#validated-string)
+  - [Validate Strings](#validated-strings)
   - [Validate Arrays](#validated-arrays)
   - [Validate Objects](#validated-objects)
   - [Create Semantic Types/Variables](#create-semantic-types)
@@ -107,11 +107,11 @@ function useInt(int: VInt<'1,10'>) {
   console.log(int.value);
 }
 
-const int: VInt<'1,10'> = VInt.createOrThrow('1,10', 5);
-const possibleInt: VInt<'1,10'> | null = VInt.create('1,10', 12);
+const int = VInt.tryCreate<'1,10'>('1,10', 5);
+const maybeInt = VInt.create<'1,10'>('1,10', 12); // Returns null
 
 useInt(int); // prints to console: 5
-useInt(possibleInt ?? VInt.create('1,10', 10)); // prints to console: 10
+useInt(maybeInt ?? VInt.tryCreate('1,10', 10)); // prints to console: 10
 ```
 
 You can also register a custom validator:
@@ -121,8 +121,8 @@ import { VInt } from 'validated-types';
 
 VInt.registerCustomValidator('isEven', (value) => value % 2 === 0);
 
-const evenNumber: VInt<'custom:isEven'> = VInt.createOrThrow('custom:isEven', 2);
-const possibleEvenNumber: VInt<'custom:isEven'> | null = VInt.create('custom:isEven', 1);
+const evenNumber = VInt.tryCreate<'custom:isEven'>('custom:isEven', 2);
+const maybeEvenNumber = VInt<'custom:isEven'>.create('custom:isEven', 1);
 ```
 
 Custom validator must be registered before it is used by any validated types `create`, `createOrThrow` or `createOrError`method.
@@ -141,11 +141,11 @@ function useFloat(float: VFloat<'positive'>) {
   console.log(float.value);
 }
 
-const float: VFloat<'positive'> = VFloat.createOrThrow('positive', 5.25);
-const possibleFloat: VFloat<'positive'> | null = VFloat.create('positive', -5.25);
+const float = VFloat.tryCreate<'positive'>('positive', 5.25);
+const maybeFloat = VFloat<'positive'>.create('positive', -5.25); // returns null
 
 useFloat(float); // prints to console: 5.25
-useFloat(possibleFloat ?? VFloat.create('positive', 1)); // prints to console: 1
+useFloat(maybeFloat ?? VFloat.tryCreate('positive', 1)); // prints to console: 1
 ```
 
 ### <a name="validated-strings"></a> Validate Strings
@@ -160,11 +160,11 @@ function useUrl(url: VString<'1,1024,url'>) {
   console.log(url.value);
 }
 
-const url: VString<'1,1024,url'> = VString.createOrThrow('1,1024,url', 'https://www.mydomain.com');
-const possibleUrl: VString<'1,1024,url'> | null = VString.create('1,1024,url', 'invalid URL');
+const url = VString.tryCreate<'1,1024,url'>('1,1024,url', 'https://www.mydomain.com');
+const maybeUrl = VString<'1,1024,url'>.create('1,1024,url', 'invalid URL'); // Returns null
 
 useUrl(url); // prints to console: https://www.mydomain.com
-useUrl(possibleUrl ?? VString.create('1,1024,url', 'https://google.com')); // prints to console: https://google.com
+useUrl(maybeUrl ?? VString.tryCreate('1,1024,url', 'https://google.com')); // prints to console: https://google.com
 ```
 
 You can combine up to 5 different string validators together. Multiple validators are given as a tuple which can have 2-5 elements. The first element of the tuple should validate the length of the string, if needed. Rest of the elements in tuple should not validate the length of string anymore.
@@ -188,11 +188,11 @@ function useUrl(url: Url) {
   console.log(url.value);
 }
 
-const url: Url = VString.createOrThrow(urlSpec, 'https://server.domain.com:8080/index.html');
-const possibleUrl: Url | null = VString.create(urlVSpec, 'invalid URL');
+const url: Url = VString.tryCreate(urlVSpec, 'https://server.domain.com:8080/index.html');
+const maybeUrl: Url | null = VString.create(urlVSpec, 'invalid URL'); // Returns null
 
 useUrl(url); // prints to console: https://server.domain.com:8080/index.html
-useUrl(possibleUrl ?? VString.create(urlVSpec, 'https://server.domain.com:8080/index.html')); // prints to console: https://server.domain.com:8080/index.html
+useUrl(maybeUrl ?? VString.tryCreate(urlVSpec, 'https://server.domain.com:8080/index.html')); // prints to console: https://server.domain.com:8080/index.html
 ```
 
 ### <a name="validated-arrays"></a> Validate Arrays
@@ -206,11 +206,11 @@ function useArray(array: VArray<'0,10,unique', number>) {
   console.log(array.value);
 }
 
-const array: VArray<'0,10,unique', number> = VArray.createOrThrow('0,10,unique', [1, 2, 3]);
-const possibleArray: VArray<'0,10,unique', number> | null = VArray.create('0,10,unique', [1, 2, 2]);
+const array = VArray.tryCreate<'0,10,unique', number>('0,10,unique', [1, 2, 3]);
+const maybeArray = VArray<'0,10,unique', number>.create('0,10,unique', [1, 2, 2]);
 
 useArray(array); // prints to console: [1, 2, 3]
-useArray(possibleArray ?? VArray.create('0,10,unique', [3, 4, 5])); // prints to console: [3, 4, 5]
+useArray(maybeArray ?? VArray.tryCreate('0,10,unique', [3, 4, 5])); // prints to console: [3, 4, 5]
 ```
 
 You can also create an array of validated objects, for example below example validates an array of from 1 to max 10 unique email addresses:
@@ -224,9 +224,9 @@ function sendEmails(emailAddresses: EmailAddresses, subject: string, body: strin
   console.log(emailAddresses.forEach(emailAddress=> emailAddress.value));
 }
 
-const emailAddress: VString<'email'> = VString.createOrThrow('email', 'test@example.com');
-const emailAddress2: VString<'email'> = VString.createOrThrow('email', 'test2@example.com');
-const emailAddresses: EmailAddresses = VArray.createOrThrow(emailAddressesVSpec, [emailAddress, emailAddress2]);
+const emailAddress = VString.tryCreate<'email'>('email', 'test@example.com');
+const emailAddress2 = VString.tryCreate<'email'>('email', 'test2@example.com');
+const emailAddresses: EmailAddresses = VArray.tryCreate(emailAddressesVSpec, [emailAddress, emailAddress2]);
 
 sendEmails(emailAddresses, 'subj', 'body'); // prints to console: 'test@example.com' and 'test2@example.com'
 ```
@@ -314,6 +314,7 @@ which both have the same base type `VString<'1,64'>`.
 import { SemVar, VString } from 'validated-types';
 
 type Name = VString<'1,64'>;
+const nameVSpec: VSpecOf<Name> = '1,64';
 type FirstName = SemVar<Name, 'firstName'>;
 type LastName = SemVar<Name, 'lastName'>;
 
@@ -322,12 +323,13 @@ function myFunc(firstName: FirstName, lastName: LastName) {
   console.log(lastName.value);
 }
 
-const firstName: Name = VString.createOrThrow('1,64', 'John');
-const lastName: Name = VString.createOrThrow('1,64', 'Doe');
+const firstName: Name = VString.tryCreate(nameVSpec, 'John');
+const lastName: Name = VString.tryCreate(nameVSpec, 'Doe');
 
 type Name2 = VString<'1,65'>
-const firstName2: Name2 = VString.createOrThrow('1,65', 'John');
-const lastName2: Name2 = VString.createOrThrow('1,65', 'Doe');
+const name2VSpec: VSpecOf<Name> = '1,64';
+const firstName2: Name2 = VString.tryCreate(name2VSpec, 'John');
+const lastName2: Name2 = VString.tryCreate(name2VSpec, 'Doe');
 
 // Only this will succeed where 'firstName' and 'lastName' are given in correct order with correct validated type
 myFunc(new SemVar({ firstName }), new SemVar({ lastName }));
@@ -346,6 +348,7 @@ myFunc(firstName, lastName);
 class VFloat<VSpec extends string> {
   static registerCustomValidator(validatorName: string, validateFunc: (value: number) => boolean): void;
   static createOrThrow(validationSpec: string, value: number, varName?: string): VFloat<VSpec> | never;
+  static tryCreate(validationSpec: string, value: number, varName?: string): VFloat<VSpec> | never;
   static create(validationSpec: string, value: number, varName?: string): VFloat<VSpec> | null;
   static createOrError(
     validationSpec: string,
@@ -362,8 +365,9 @@ class VFloat<VSpec extends string> {
 Registers a custom validator with given name. `validateFunc` receives a float value as parameter and returns boolean based on success of validation.
 You must register your custom validator before using it in any of the `create` functions.
 
-#### <a name="vfloat-createOrThrow"></a>VFloat.createOrThrow
+#### <a name="vfloat-createOrThrow"></a>VFloat.createOrThrow and VFloat.tryCreate
 `static createOrThrow(validationSpec: string, value: number, varName?: string): VFloat<VSpec> | never`
+`static tryCreate(validationSpec: string, value: number, varName?: string): VFloat<VSpec> | never`
 
 Creates a new validated float value object or throws a `ValidationError` exception if supplied value is invalid.
 `validationSpec` is a string of following form `'[<minValue>],[<maxValue>] | negative | positive | custom:<custom_validator_name>'`.
@@ -412,6 +416,7 @@ Returns the valid float value.
 class VInt<VSpec extends string> {
   static registerCustomValidator(validatorName: string, validateFunc: (value: number) => boolean): void;
   static createOrThrow(validationSpec: string, value: number, varName?: string): VInt<VSpec> | never;
+  static tryCreate(validationSpec: string, value: number, varName?: string): VInt<VSpec> | never;
   static create(validationSpec: string, value: number, varName?: string): VInt<VSpec> | null;
   static createOrError(
     validationSpec: string,
@@ -428,8 +433,9 @@ class VInt<VSpec extends string> {
 Registers a custom validator with given name. `validateFunc` receives a number as parameter and returns boolean based on success of validation.
 You must register your custom validator before using it in any of the `create` functions.
 
-#### <a name="vint-createOrThrow"></a>VInt.createOrThrow
+#### <a name="vint-createOrThrow"></a>VInt.createOrThrow and VInt.tryCreate
 `static createOrThrow(validationSpec: string, value: number, varName?: string): VInt<VSpec> | never`
+`static tryCreate(validationSpec: string, value: number, varName?: string): VInt<VSpec> | never`
 
 Creates a new validated integer value object or throws a `ValidationError` exception if supplied value is invalid.
 `validationSpec` is a string of following form `'[<minValue>],[<maxValue>][,<divisibleByValue>] | negative | positive | custom:<custom_validator_name>'`.
@@ -480,6 +486,7 @@ Returns the valid integer value.
 class VString<VSpec extends string> {
   static registerCustomValidator(validatorName: string, validateFunc: (value: string) => boolean): void;
   static createOrThrow(validationSpec: string, value: number, varName?: string): VString<VSpec> | never;
+  static tryCreate(validationSpec: string, value: number, varName?: string): VString<VSpec> | never;
   static create(validationSpec: string, value: number, varName?: string): VString<VSpec> | null;
   static createOrError(
     validationSpec: string,
@@ -496,8 +503,9 @@ class VString<VSpec extends string> {
 Registers a custom validator with given name. `validateFunc` receives a string value as parameter and returns boolean based on success of validation.
 You must register your custom validator before using it in any of the `create` functions.
 
-#### <a name="vstring-createOrThrow"></a>VString.createOrThrow
+#### <a name="vstring-createOrThrow"></a>VString.createOrThrow and VString.tryCreate
 `static createOrThrow(validationSpec: string, value: number, varName?: string): VString<VSpec> | never`
+`static tryCreate(validationSpec: string, value: number, varName?: string): VString<VSpec> | never`
 
 Creates a new validated integer value object or throws a `ValidationError` exception if supplied value is invalid.
 `validationSpec` is a string of following form `'[<minLength>],<maxLength>[,<unknown_length_validator_name>[,<parameter>]] | <known_length_validator_name> | custom:<custom_validator_name>'`.
@@ -621,6 +629,7 @@ Returns the valid string value.
 class VArray<VSpec extends string, T> {
   static registerCustomValidator(validatorName: string, validateFunc: (value: T[]) => boolean): void;
   static createOrThrow(validationSpec: string, value: T[], varName?: string): VArray<VSpec, T> | never;
+  static tryCreate(validationSpec: string, value: T[], varName?: string): VArray<VSpec, T> | never;
   static create(validationSpec: string, value: T[], varName?: string): VArray<VSpec, T> | null;
   static createOrError(
     validationSpec: string,
@@ -637,8 +646,9 @@ class VArray<VSpec extends string, T> {
 Registers a custom validator with given name. `validateFunc` receives an array as parameter and returns boolean based on success of validation.
 You must register your custom validator before using it in any of the `create` functions.
 
-#### <a name="varray-createOrThrow"></a>VArray.createOrThrow
+#### <a name="varray-createOrThrow"></a>VArray.createOrThrow and VArray.tryCreate
 `static createOrThrow(validationSpec: string, value: T[], varName?: string): VArray<VSpec, T> | never`
+`static tryCreate(validationSpec: string, value: T[], varName?: string): VArray<VSpec, T> | never`
 
 Creates a new validated array value object or throws a `ValidationError` exception if supplied value is invalid.
 `validationSpec` is a string of following form `'[<minLength>],<maxLength>[,unique] | custom:<custom_validator_name>'`.
@@ -708,17 +718,17 @@ Extracts the validation spec type of the validated type.
 For example:
 
 ```ts
-type Month = VInt<'1,12'>);
+type Month = VInt<'1,12'>;
 const monthVSpec: VSpecOf<Month> = '1,12';
-const month: Month = VInt.createOrThrow(monthVSpec, 1);
+const month: Month = VInt.tryCreate(monthVSpec, 1);
 
 type Percent = VFloat<'0,100'>;
 const percentVSpec: VSpecOf<Percent> = '0,100';
-const percent: Percent = VFloat.createOrThrow(percentVSpec, 25.0);
+const percent: Percent = VFloat.tryCreate(percentVSpec, 25.0);
 
 type Url = VString<['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html']>;
 const urlVSpec: VSpecOf<Url> = ['1,1024,lowercase', 'url', 'startsWith,https', 'endsWith,.html'];
-const url: Url = VString.createOrThrow(urlVSpec, 'https://server.domain.com:8080/index.html');
+const url: Url = VString.tryCreate(urlVSpec, 'https://server.domain.com:8080/index.html');
 ```
 
 ## <a name="feedback"></a> Feedback

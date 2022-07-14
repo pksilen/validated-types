@@ -27,6 +27,15 @@ export default class VInt<VSpec extends string> extends VBase<number> {
     return new VInt(validationSpec, value, varName);
   }
 
+  // this will throw if invalid value is given that don't match the validation spec
+  static tryCreate<VSpec extends string>(
+    validationSpec: IntValidationSpec<VSpec>,
+    value: number,
+    varName?: string
+  ): VInt<VSpec> | never {
+    return new VInt(validationSpec, value, varName);
+  }
+
   static create<VSpec extends string>(
     validationSpec: IntValidationSpec<VSpec>,
     value: number

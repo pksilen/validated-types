@@ -2,14 +2,29 @@
 
 import VInt from './VInt';
 
-VInt.registerCustomValidator('is5', (value) => value === 5);
-
-function log(int: VInt<'0,2'>) {
+function useInt(int: VInt<'1,10'>) {
+  // use int here
   console.log(int.value);
 }
 
-const int1: VInt<'0,10,'> = VInt.createOrThrow<'0,10,'>('0,10,', 5);
-// const int2: VInt<'0,10'> = int1;
+const int = VInt.createOrThrow<'1,10'>('1,10', 5);
+const maybeInt = VInt.create<'1,10'>('1,10', 12);
+
+useInt(int); // prints to console: 5
+useInt(maybeInt ?? VInt.createOrThrow('1,10', 10)); // prints to console: 10
+
+VInt.registerCustomValidator('is5', (value) => value === 5);
+
+function log(int: VInt<'0,10,'>) {
+  // NOOP
+}
+
+const int1 = VInt.createOrThrow<'0,10,'>('0,10,', 5);
+const int2: VInt<'0,10,'> = int1;
+
+log(int2);
+
+VInt.createOrThrow<'negative'>('negative', -5);
 
 describe('VInt', () => {
   describe('createOrThrow', () => {

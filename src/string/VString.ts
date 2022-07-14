@@ -116,6 +116,52 @@ export default class VString<ValidationSpec extends string | string[]> extends V
     return new VString<VSpec>(validationSpec, value, varName);
   }
 
+  // this will throw if invalid value is given that don't match the validation spec
+  static tryCreate<VSpec extends string>(
+    validationSpec: StringValidationSpecWithLength<VSpec>,
+    value: string,
+    varName?: string
+  ): VString<VSpec> | never;
+
+  // this will throw if invalid value is given that don't match the validation spec
+  static tryCreate<VSpec extends [string, string]>(
+    validationSpec: TwoStringValidationSpecs<VSpec>,
+    value: string,
+    varName?: string
+  ): VString<VSpec> | never;
+
+  // this will throw if invalid value is given that don't match the validation spec
+  static tryCreate<VSpec extends [string, string, string]>(
+    validationSpec: ThreeStringValidationSpecs<VSpec>,
+    value: string,
+    varName?: string
+  ): VString<VSpec> | never;
+
+  // this will throw if invalid value is given that don't match the validation spec
+  static tryCreate<VSpec extends [string, string, string, string]>(
+    validationSpec: FourStringValidationSpecs<VSpec>,
+    value: string,
+    varName?: string
+  ): VString<VSpec> | never;
+
+  // this will throw if invalid value is given that don't match the validation spec
+  static tryCreate<VSpec extends [string, string, string, string, string]>(
+    validationSpec: FiveStringValidationSpecs<VSpec>,
+    value: string,
+    varName?: string
+  ): VString<VSpec> | never;
+
+  // this will throw if invalid value is given that don't match the validation spec
+  static tryCreate<VSpec extends string | string[]>(
+    validationSpec: VSpec extends string
+      ? StringValidationSpecWithLength<VSpec>
+      : StringValidationSpecs<VSpec>,
+    value: string,
+    varName?: string
+  ): VString<VSpec> | never {
+    return new VString<VSpec>(validationSpec, value, varName);
+  }
+
   static create<VSpec extends string>(
     validationSpec: StringValidationSpecWithLength<VSpec>,
     value: string,

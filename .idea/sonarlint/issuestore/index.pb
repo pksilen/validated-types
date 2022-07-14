@@ -21,10 +21,6 @@ _
 /src/string/UnknownLengthStringValidatorNames.ts,9/8/983ec1d683eb5d9943c4fba7e7090b87012478e6
 J
 src/string/VString.spec.ts,5/4/54763685a16c7e1af36df511ed4bc71edf627765
-C
-src/base/VSpecOf.ts,4/6/462c00f097c8637655ff8b4c3cf313d26e2b011e
 :
 
 .gitignore,a/5/a5cc2925ca8258af241be7e5b0381edf30266302
-I
-src/semvar/SemVar.spec.ts,b/0/b06a14b9d1130a111a2848a581e5c879b644edf9
