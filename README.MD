@@ -49,9 +49,9 @@ It also allows of creating semantic types and declare variables with semantic ty
     - [create](#varray-create)
     - [createOrError](#varray-createOrError)
     - [value](#varray-value)
-  - [SemVar](#semvar)
-    - [constructor](#semvar-constructor)
-    - [value](#semvar-value)
+  - [SemType](#SemType)
+    - [constructor](#SemType-constructor)
+    - [value](#SemType-value)
   - [VSpecOf](#vspecof)
 - [Feedback](#feedback)
 - [License](#license)
@@ -88,7 +88,7 @@ Your application typically receives unvalidated input data from external sources
 - Reading data from socket (network input)
 - End-user input from user interface
 
-You can also create semantic types and semantically typed variables using `SemVar`. Using semantic types, you
+You can also create semantic types and semantically typed variables using `SemType`. Using semantic types, you
 can differentiate between multiple types of the same basic type. For example, If a function accepts two boolean arguments, it is possible
 that the calling function gives those two arguments in wrong order, but you never notice it, because it does not generate a compilation error.
 Using semantic types, you can differentiate between those two boolean types by giving them two different semantic names. 
@@ -283,10 +283,10 @@ Semantic types and variables let you differentiate between variables of same typ
 by assigning a semantic name to the type. Following example declares two semantic variables of `boolean` type with two different semantic names.
 
 ```ts
-import { SemVar } from 'validated-types';
+import { SemType } from 'validated-types';
 
-type IsRecursiveCall = SemVar<boolean, 'isRecursiveCall'>
-type IsInternalCall = SemVar<boolean, 'isInternalCall'>;
+type IsRecursiveCall = SemType<boolean, 'isRecursiveCall'>
+type IsInternalCall = SemType<boolean, 'isInternalCall'>;
 
 function myFunc(isRecursiveCall: IsRecursiveCall, isInternalCall: IsInternalCall) {
   console.log(isRecursiveCall.value);
@@ -297,26 +297,26 @@ const isRecursiveCall = false;
 const isInternalCall = true;
 
 // Only this will succeed
-myFunc(new SemVar({ isRecursiveCall }), new SemVar({ isInternalCall }));
+myFunc(new SemType({ isRecursiveCall }), new SemType({ isInternalCall }));
 
 // These will fail during compilation
-myFunc(new SemVar({ isInternalCall }), new SemVar({ isRecursiveCall }));
+myFunc(new SemType({ isInternalCall }), new SemType({ isRecursiveCall }));
 myFunc(true, true);
-myFunc(new SemVar('isSomethingElse', true), new SemVar('isInternalCall', true));
-myFunc(new SemVar('isRecursiveCall', false), new SemVar('isSomethingElse', true));
-myFunc(new SemVar('isSomethingElse', true), new SemVar('isSomethingElse', true));
+myFunc(new SemType('isSomethingElse', true), new SemType('isInternalCall', true));
+myFunc(new SemType('isRecursiveCall', false), new SemType('isSomethingElse', true));
+myFunc(new SemType('isSomethingElse', true), new SemType('isSomethingElse', true));
 ```
 
 You can use a validated type as a semantic type also. In the below example, a function takes two semantic parameters
 which both have the same base type `VString<'1,64'>`.
 
 ```ts
-import { SemVar, VString } from 'validated-types';
+import { SemType, VString } from 'validated-types';
 
 type Name = VString<'1,64'>;
 const nameVSpec: VSpecOf<Name> = '1,64';
-type FirstName = SemVar<Name, 'firstName'>;
-type LastName = SemVar<Name, 'lastName'>;
+type FirstName = SemType<Name, 'firstName'>;
+type LastName = SemType<Name, 'lastName'>;
 
 function myFunc(firstName: FirstName, lastName: LastName) {
   console.log(firstName.value);
@@ -332,11 +332,11 @@ const firstName2: Name2 = VString.tryCreate(name2VSpec, 'John');
 const lastName2: Name2 = VString.tryCreate(name2VSpec, 'Doe');
 
 // Only this will succeed where 'firstName' and 'lastName' are given in correct order with correct validated type
-myFunc(new SemVar({ firstName }), new SemVar({ lastName }));
+myFunc(new SemType({ firstName }), new SemType({ lastName }));
 
 // These below will fail during compilation
-myFunc(new SemVar({ lastName }), new SemVar({ firstName }));
-myFunc(new SemVar({ firstName: firstName2 }), new SemVar({ lastName: lastName2 }));
+myFunc(new SemType({ lastName }), new SemType({ firstName }));
+myFunc(new SemType({ firstName: firstName2 }), new SemType({ lastName: lastName2 }));
 myFunc('John', 'Doe');
 myFunc(firstName, lastName);
 ```
@@ -689,26 +689,26 @@ if (err) {
 
 Returns the validated array.
 
-### <a name="semvar"></a> SemVar
+### <a name="SemType"></a> SemType
 `T` is the type of Semantic variable. 
 
 ```ts
 type SemName<N extends string> = N extends `${infer Name}` ? `${Name}` : never;
 
-class SemVar<T, N extends string> {
+class SemType<T, N extends string> {
   constructor(semanticName: SemName<N>, value: T);
-  constructor(semVar: { [K in SemName<N>]: T });
+  constructor(semType: { [K in SemName<N>]: T });
   get value(): T;
 }
 ```
 
-#### <a name="semvar-constructor"></a> constructor
+#### <a name="SemType-constructor"></a> constructor
 `constructor(semanticName: string, value: T)`  
-`constructor(semVar: { [K in SemName<N>]: T });`
+`constructor(semType: { [K in SemName<N>]: T });`
 
 Creates a new semantic variable with semantic name `semanticName` and with value of type `T`.
 
-#### <a name="semvar-value"></a> value
+#### <a name="SemType-value"></a> value
 `get value(): T`
 Get the value of semantic variable.
 

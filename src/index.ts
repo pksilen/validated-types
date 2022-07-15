@@ -5,4 +5,5 @@ export { default as VInt } from './integer/VInt';
 export { default as VString } from './string/VString';
 export { default as VArray } from './array/VArray';
 export { default as SemVar } from './semvar/SemVar';
+export { default as SemType } from './semtype/SemType';
 export { VSpecOf } from './base/VSpecOf';
