@@ -1,5 +1,6 @@
 import validator from 'validator';
 import { stringValidators } from './stringValidators';
+import VString from './VString';
 
 jest.mock('validator');
 
@@ -434,6 +435,41 @@ describe('stringValidators', () => {
     it('should return false if not parameter supplied', () => {
       const doesStart = stringValidators.startsWith('url');
       expect(doesStart).toEqual(false);
+    });
+  });
+  describe('numericRange', () => {
+    it('should validate string that belongs to numeric range', () => {
+      const isValid = stringValidators.numericRange('5', '1-65535');
+      expect(isValid).toEqual(true);
+    });
+    it('should return false if string does not belong to numeric range', () => {
+      const isValid = stringValidators.numericRange('0', '1-65535');
+      expect(isValid).toEqual(false);
+    });
+    it('should return false if string is not a number', () => {
+      const isValid = stringValidators.numericRange('ff', '1-65535');
+      expect(isValid).toEqual(false);
+    });
+    it('should throw ValidationSpecError if parameter is not a valid numeric range', () => {
+      expect(() => {
+        stringValidators.numericRange('ff', '-3');
+      }).toThrow(
+        'Validator parameter must a numeric range in format <minValue>-<maxValue>, for example 1-65535'
+      );
+    });
+    it('should throw ValidationSpecError if parameter is invalid', () => {
+      expect(() => {
+        stringValidators.numericRange('ff', '1:3');
+      }).toThrow(
+        'Validator parameter must a numeric range in format <minValue>-<maxValue>, for example 1-65535'
+      );
+    });
+    it('should return false if parameter not supplied', () => {
+      expect(() => {
+        stringValidators.numericRange('5');
+      }).toThrow(
+        'Validator parameter must a numeric range in format <minValue>-<maxValue>, for example 1-65535'
+      );
     });
   });
   describe('endsWith', () => {

@@ -11,7 +11,7 @@ export type ArrayValidationSpec<ValidationSpec extends string> =
     : never;
 
 export default class VArray<ValidationSpec extends string, T> extends VBase<T[]> {
-  private readonly validatedValue: T[];
+  protected readonly validatedValue: T[];
 
   // this will throw if invalid value is given that don't match the validation spec
   static createOrThrow<VSpec extends string, T>(
@@ -57,15 +57,15 @@ export default class VArray<ValidationSpec extends string, T> extends VBase<T[]>
 
   protected constructor(
     protected readonly validationSpec: ArrayValidationSpec<ValidationSpec>,
-    value: T[],
+    protected readonly arrayValue: T[],
     varName?: string
   ) {
     super();
     const validationSpecAsStr = validationSpec as string;
-    VBase.validateByCustomValidator(validationSpecAsStr, value, varName);
-    VBase.validateLength(validationSpec, value, varName);
-    this.validateUniqueArrayElements(validationSpec, value, varName);
-    this.validatedValue = value;
+    VBase.validateByCustomValidator(validationSpecAsStr, arrayValue, varName);
+    VBase.validateLength(validationSpec, arrayValue, varName);
+    this.validateUniqueArrayElements(validationSpec, arrayValue, varName);
+    this.validatedValue = arrayValue;
   }
 
   private validateUniqueArrayElements(validationSpec: string, values: T[], varName?: string) {

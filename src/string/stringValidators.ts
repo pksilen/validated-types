@@ -5,6 +5,7 @@ import { KnownLengthStringValidatorNames } from './KnownLengthStringValidatorNam
 import { UnknownLengthStringValidatorNames } from './UnknownLengthStringValidatorNames';
 import { ParameterizedStringValidatorNames } from './ParameterizedStringValidatorNames';
 import parseJSONArrayParameter from './parseJSONArrayParameter';
+import ValidationSpecError from '../error/ValidationSpecError';
 
 export const stringValidators: {
   [ValidatorName in
@@ -80,4 +81,28 @@ export const stringValidators: {
   isNoneOf: (value, parameter) => !parseJSONArrayParameter(parameter).includes(value),
   startsWith: (value, parameter) => (parameter ? value.startsWith(parameter) : false),
   endsWith: (value, parameter) => (parameter ? value.endsWith(parameter) : false),
+  numericRange: (value, parameter) => {
+    if (parameter) {
+      const [minValueString, maxValueString] = parameter.split('-');
+      if (minValueString && maxValueString) {
+        const minValue = parseInt(minValueString, 10);
+        const maxValue = parseInt(maxValueString, 10);
+        if (isNaN(minValue) || isNaN(maxValue)) {
+          throw new ValidationSpecError(
+            'Validator parameter must a numeric range in format <minValue>-<maxValue>, for example 1-65535'
+          );
+        }
+        const parsedValue = parseInt(value, 10);
+        return parsedValue >= minValue && parsedValue <= maxValue;
+      } else {
+        throw new ValidationSpecError(
+          'Validator parameter must a numeric range in format <minValue>-<maxValue>, for example 1-65535'
+        );
+      }
+    } else {
+      throw new ValidationSpecError(
+        'Validator parameter must a numeric range in format <minValue>-<maxValue>, for example 1-65535'
+      );
+    }
+  },
 };

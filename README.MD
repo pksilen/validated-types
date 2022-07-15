@@ -547,6 +547,7 @@ Possible value for `<unknown_length_validator_name>`:
 - isNoneOf (requires JSON string array `parameter`)
 - startsWith (requires `parameter`)
 - endsWith (requires `parameter`)
+- numericRange (requires `parameter`in format: `<minValue>-<maxValue>`, e.g. 1-65535)
 
 Possible values for `<known_length_validator_name>`:
 

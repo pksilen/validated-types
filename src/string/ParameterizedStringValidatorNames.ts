@@ -4,4 +4,5 @@ export type ParameterizedStringValidatorNames =
   | 'isOneOf'
   | 'isNoneOf'
   | 'startsWith'
-  | 'endsWith';
+  | 'endsWith'
+  | 'numericRange';
