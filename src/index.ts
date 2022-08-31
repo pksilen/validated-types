@@ -6,4 +6,7 @@ export { default as VString } from './string/VString';
 export { default as VArray } from './array/VArray';
 export { default as SemVar } from './semvar/SemVar';
 export { default as SemType } from './semtype/SemType';
+export { default as SemVFloat } from './semfloat/SemVFloat';
+export { default as SemVInt } from './seminteger/SemVInt';
+export { default as SemVString } from './semstring/SemVString';
 export { VSpecOf } from './base/VSpecOf';

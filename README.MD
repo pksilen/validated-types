@@ -24,6 +24,9 @@ It also allows of creating semantic types and declare variables with semantic ty
   - [Validate Arrays](#validated-arrays)
   - [Validate Objects](#validated-objects)
   - [Create Semantic Types/Variables](#create-semantic-types)
+  - [Create Semantic Validated Integers](#create-semantic-validated-integers)
+  - [Create Semantic Validated Floats](#create-semantic-validated-floats)
+  - [Create Semantic Validated Strings](#create-semantic-validated-strings)
 - [API Documentation](#api-documentation)
   - [VFloat](#vfloat)
     - [registerCustomValidator](#vfloat-registerCustomValidator)
@@ -340,6 +343,37 @@ myFunc(new SemType({ firstName: firstName2 }), new SemType({ lastName: lastName2
 myFunc('John', 'Doe');
 myFunc(firstName, lastName);
 ```
+
+### <a name="create-semantic-validated-integers"></a> Create Semantic Validated Integers
+
+```ts
+import { SemVInt } from 'validated-types';
+
+type HttpPort = SemVInt<'httpPort', '1,65535'>;
+const httpPort: HttpPort = SemVInt.tryCreate('httpPort', '1,65535', 8080);
+console.log(httpPort.value); // Prints 8080
+```
+
+### <a name="create-semantic-validated-floats"></a> Create Semantic Validated Floats
+
+```ts
+import { SemVFloat } from 'validated-types';
+
+type LoanInterest = SemVFloat<'loanInterest', '0,100'>;
+const loanInterest: LoanInterest = SemVFloat.tryCreate('loanInterest', '0,100', 4.99);
+console.log(loanInterest.value); // Prints 4.99
+```
+
+### <a name="create-semantic-validated-strings"></a> Create Semantic Validated Strings
+
+```ts
+import { SemVString } from 'validated-types';
+
+type LoginUrl = SemVString<'loginUrl', '1,8192,url'>;
+const loginUrl: LoginUrl = SemVString.tryCreate('loginUrl', '1,8192,url', "https://server.com");
+console.log(loginUrl.value) // Prints https://server.com
+```
+
 ## <a name="api-documentation"></a> API documentation
 
 ### <a name="vfloat"></a> VFloat

@@ -41,27 +41,27 @@ export type StringValidationSpec<ValidationSpec extends string | undefined> =
       : { errorMessage: `Invalid string validator name: ${KnownLengthStringValidatorName}` }
     : never;
 
-type TwoStringValidationSpecs<VSpec extends string | string[]> = [
+export type TwoStringValidationSpecs<VSpec extends string | string[]> = [
   StringValidationSpecWithLength<VSpec[0]>,
   StringValidationSpec<VSpec[1]>
 ];
 
-type ThreeStringValidationSpecs<VSpec extends string | string[]> = [
+export type ThreeStringValidationSpecs<VSpec extends string | string[]> = [
   ...TwoStringValidationSpecs<VSpec>,
   StringValidationSpec<VSpec[2]>
 ];
 
-type FourStringValidationSpecs<VSpec extends string | string[]> = [
+export type FourStringValidationSpecs<VSpec extends string | string[]> = [
   ...ThreeStringValidationSpecs<VSpec>,
   StringValidationSpec<VSpec[3]>
 ];
 
-type FiveStringValidationSpecs<VSpec extends string | string[]> = [
+export type FiveStringValidationSpecs<VSpec extends string | string[]> = [
   ...FourStringValidationSpecs<VSpec>,
   StringValidationSpec<VSpec[4]>
 ];
 
-type StringValidationSpecs<VSpec extends string | string[]> =
+export type StringValidationSpecs<VSpec extends string | string[]> =
   | FiveStringValidationSpecs<VSpec>
   | FourStringValidationSpecs<VSpec>
   | ThreeStringValidationSpecs<VSpec>
@@ -251,7 +251,7 @@ export default class VString<ValidationSpec extends string | string[]> extends V
     }
   }
 
-  protected constructor(
+  public constructor(
     protected readonly validationSpec: ValidationSpec extends string
       ? StringValidationSpecWithLength<ValidationSpec>
       : StringValidationSpecs<ValidationSpec>,

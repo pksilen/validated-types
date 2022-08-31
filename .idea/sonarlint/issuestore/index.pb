@@ -18,18 +18,12 @@ F
 src/base/VBase.spec.ts,c/6/c6d191484d3c442faed1a425396433cf6e211d95
 H
 src/array/Varray.spec.ts,b/e/be555d3566c7108b5a8206b2040ede93bb52e16c
-H
-src/float/VFloat.spec.ts,e/f/ef22b7cefd2d153a47f5fc59bb852d870d8fb1fa
 =
 tsconfig.json,6/1/61ebb9fd6e8cf9082658121d5d81e297791dacd0
-H
-src/integer/VInt.spec.ts,c/a/cabfb8967e263c1cd7d51cce947f50edbdb32d8d
 C
 src/base/VSpecOf.ts,4/6/462c00f097c8637655ff8b4c3cf313d26e2b011e
 C
 src/float/VFloat.ts,a/6/a6cba3511f144a9c1da6e1babbdc2ffdef9f86ba
-C
-src/integer/VInt.ts,f/f/ff8309659c659e6920e3a947d26820e8d342fab6
 ]
 -src/string/KnownLengthStringValidatorNames.ts,6/a/6a10bbf7ebc1090931b66747f440db0d46d155e9
 _
@@ -42,11 +36,9 @@ S
 #src/string/stringValidators.spec.ts,4/3/43e10db965981b670ced3047185e8d4f609830ae
 N
 src/string/stringValidators.ts,d/2/d20fb0edf0f777a1af9d1743af9fc2018fd4aac8
-E
-src/string/VString.ts,7/3/73323e9182fb13206a7b17f24c271a07ffc072b0
 A
 src/base/VBase.ts,8/d/8d27b0f95faaf7ff0a5fb42808e16b86f905ff9c
-C
-src/array/VArray.ts,d/b/db870033d6cdab9f997760831118eab082b1aa24
 <
 package.json,7/0/7030d0b2f71b999ff89a343de08c414af32fc93a
+I
+src/semvar/SemVar.spec.ts,b/0/b06a14b9d1130a111a2848a581e5c879b644edf9
