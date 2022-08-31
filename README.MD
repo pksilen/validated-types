@@ -55,6 +55,9 @@ It also allows of creating semantic types and declare variables with semantic ty
   - [SemType](#SemType)
     - [constructor](#SemType-constructor)
     - [value](#SemType-value)
+  - [SemVInt](#SemVInt)
+  - [SemVFloat](#SemVFloat)
+  - [SemVString](#SemVString)
   - [VSpecOf](#vspecof)
 - [Feedback](#feedback)
 - [License](#license)
@@ -96,6 +99,15 @@ can differentiate between multiple types of the same basic type. For example, If
 that the calling function gives those two arguments in wrong order, but you never notice it, because it does not generate a compilation error.
 Using semantic types, you can differentiate between those two boolean types by giving them two different semantic names. 
 Semantic name is just any string describing the purpose of type/variable.
+
+The library contains static factory methods in the classes forr creating a new instance of the specific class.
+There are different factory methods available. You can choose which factory method to use depending on your
+application need. The factory methods are following:
+
+- `tryCreate(...)` creates a validated value object or throws an exception
+- `createOrThrow(...)` is same as above, i.e. creates a validated value object or throws an exception
+- `create(...)` creates a validated value object or returns `null`. Use this method if you don't need the error reason
+- `createOrError(...)` creates a validated value object or returns an error object
 
 ### <a name="validated-integers"></a> Validate Integers
 
@@ -381,6 +393,7 @@ console.log(loginUrl.value) // Prints https://server.com
 ```ts
 class VFloat<VSpec extends string> {
   static registerCustomValidator(validatorName: string, validateFunc: (value: number) => boolean): void;
+  
   static createOrThrow(validationSpec: string, value: number, varName?: string): VFloat<VSpec> | never;
   static tryCreate(validationSpec: string, value: number, varName?: string): VFloat<VSpec> | never;
   static create(validationSpec: string, value: number, varName?: string): VFloat<VSpec> | null;
@@ -518,10 +531,10 @@ Returns the valid integer value.
 
 ```ts
 class VString<VSpec extends string> {
-  static registerCustomValidator(validatorName: string, validateFunc: (value: string) => boolean): void;
-  static createOrThrow(validationSpec: string, value: number, varName?: string): VString<VSpec> | never;
-  static tryCreate(validationSpec: string, value: number, varName?: string): VString<VSpec> | never;
-  static create(validationSpec: string, value: number, varName?: string): VString<VSpec> | null;
+  static registerCustomValidator(validatorName: string | string[], validateFunc: (value: string) => boolean): void;
+  static createOrThrow(validationSpec: string | string[], value: number, varName?: string): VString<VSpec> | never;
+  static tryCreate(validationSpec: string | string[], value: number, varName?: string): VString<VSpec> | never;
+  static create(validationSpec: string | string[], value: number, varName?: string): VString<VSpec> | null;
   static createOrError(
     validationSpec: string,
     value: number,
@@ -737,7 +750,7 @@ class SemType<T, N extends string> {
 ```
 
 #### <a name="SemType-constructor"></a> constructor
-`constructor(semanticName: string, value: T)`  
+`constructor(semanticName: SemName<N>, value: T)`  
 `constructor(semType: { [K in SemName<N>]: T });`
 
 Creates a new semantic variable with semantic name `semanticName` and with value of type `T`.
@@ -746,6 +759,90 @@ Creates a new semantic variable with semantic name `semanticName` and with value
 `get value(): T`
 Get the value of semantic variable.
 
+### <a name="SemVInt"></a> SemVInt
+
+```ts
+type SemName<N extends string> = N extends `${infer Name}` ? `${Name}` : never;
+
+class SemVInt<Name extends string, VSpec extends string> {
+  static tryCreate<Name extends string, VSpec extends string>(
+    semanticName: SemName<Name>,
+    validationSpec: IntValidationSpec<VSpec>,
+    value: number,
+    varName?: string
+  ): SemVInt<Name, VSpec> | never; // Throws on error
+
+  static create<Name extends string, VSpec extends string>(
+    semanticName: SemName<Name>,
+    validationSpec: IntValidationSpec<VSpec>,
+    value: number
+  ): SemVInt<Name, VSpec> | null; // Returns null on error
+
+  static createOrError<Name extends string, VSpec extends string>(
+    semanticName: SemName<Name>,
+    validationSpec: IntValidationSpec<VSpec>,
+    value: number,
+    varName?: string
+  ): [SemVInt<Name, VSpec>, null] | [null, Error] // Returns a pair [null, Error] on error
+}
+```
+
+### <a name="SemVFloat"></a> SemVFloat
+
+```ts
+type SemName<N extends string> = N extends `${infer Name}` ? `${Name}` : never;
+
+class SemVFloat<Name extends string, VSpec extends string> {
+  static tryCreate<Name extends string, VSpec extends string>(
+    semanticName: SemName<Name>,
+    validationSpec: FloatValidationSpec<VSpec>,
+    value: number,
+    varName?: string
+  ): SemVFloat<Name, VSpec> | never; // Throws on error
+
+  static create<Name extends string, VSpec extends string>(
+    semanticName: SemName<Name>,
+    validationSpec: FloatValidationSpec<VSpec>,
+    value: number
+  ): SemVFloat<Name, VSpec> | null // Returns null on error
+
+  static createOrError<Name extends string, VSpec extends string>(
+    semanticName: SemName<Name>,
+    validationSpec: FloatValidationSpec<VSpec>,
+    value: number,
+    varName?: string
+  ): [SemVFloat<Name, VSpec>, null] | [null, Error]; // Returns a pair [null, Error] on error
+}
+```
+
+### <a name="SemVString"></a> SemVString
+
+```ts
+type SemName<N extends string> = N extends `${infer Name}` ? `${Name}` : never;
+
+class SemVString<Name extends string, VSpec extends string | string[]> {
+  static tryCreate<Name extends string, VSpec extends string | string[]>(
+    semanticName: SemName<Name>,
+    validationSpec: string | string[],
+    value: string,
+    varName?: string
+  ): SemVString<Name, VSpec> | never; // Throws on error
+
+  static create<Name extends string, VSpec extends string>(
+    semanticName: SemName<Name>,
+    validationSpec: string | string[],
+    value: string,
+    varName?: string
+  ): SemVString<Name, VSpec> | null; // Returns null on error
+
+  static createOrError<Name extends string, VSpec extends string>(
+    semanticName: SemName<Name>,
+    validationSpec: string | string[],
+    value: string,
+    varName?: string
+  ): [SemVString<Name, VSpec>, null] | [null, Error]; // Returns a pair [null, Error] on error
+}
+```
 ### <a name="vspecof"></a> VSpecOf
 
 Extracts the validation spec type of the validated type.
