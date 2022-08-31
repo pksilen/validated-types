@@ -3,8 +3,6 @@ L
 src/error/ValidationError.ts,6/e/6eebe10c033ac60ac0495182f2a31f8f656fcc76
 P
  src/error/ValidationSpecError.ts,6/e/6ee0925f05e95928febe47a288a8b23aa92bd776
-D
-.circleci/config.yml,f/d/fd5da61396a8376845bee5cdf71aaf3c98a888ae
 F
 .sonarcloud.properties,8/c/8c2ee9288b17817bf601b83cde380a0086a67745
 _
@@ -38,7 +36,5 @@ N
 src/string/stringValidators.ts,d/2/d20fb0edf0f777a1af9d1743af9fc2018fd4aac8
 A
 src/base/VBase.ts,8/d/8d27b0f95faaf7ff0a5fb42808e16b86f905ff9c
-<
-package.json,7/0/7030d0b2f71b999ff89a343de08c414af32fc93a
 I
 src/semvar/SemVar.spec.ts,b/0/b06a14b9d1130a111a2848a581e5c879b644edf9

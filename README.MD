@@ -107,7 +107,7 @@ application need. The factory methods are following:
 - `tryCreate(...)` creates a validated value object or throws an exception
 - `createOrThrow(...)` is same as above, i.e. creates a validated value object or throws an exception
 - `create(...)` creates a validated value object or returns `null`. Use this method if you don't need the error reason
-- `createOrError(...)` creates a validated value object or returns an error object
+- `createOrError(...)` creates a validated value object or returns an error object, always returns a pair (is similar to Golang returning an error)
 
 ### <a name="validated-integers"></a> Validate Integers
 
