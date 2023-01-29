@@ -1,4 +1,5 @@
-<span style="color:red; font-weight:bold">Check out my new book</span> [Clean Code Principles And Patterns: A Software Practitioner's Handbook](https://www.amazon.com/Clean-Code-Principles-Patterns-Practitioners-ebook/dp/B0BSDJKYQJ/ref=sr_1_1?crid=21AZI8PH67EU6&keywords=clean+code+principles&qid=1674981660&sprefix=clean+code+principle%2Caps%2C167&sr=8-1)**
+<span style="color:red">**Check out my new book**</span>
+[Clean Code Principles And Patterns: A Software Practitioner's Handbook](https://www.amazon.com/Clean-Code-Principles-Patterns-Practitioners-ebook/dp/B0BSDJKYQJ/ref=sr_1_1?crid=21AZI8PH67EU6&keywords=clean+code+principles&qid=1674981660&sprefix=clean+code+principle%2Caps%2C167&sr=8-1)**
 
 # validated-types
 
